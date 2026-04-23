@@ -17,24 +17,63 @@
       --accent: #00d4aa;
     }
 
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      height: 100vh;
-      overflow-y: auto;
-      padding: 16px 12px;
-      scrollbar-width: thin;
-      scrollbar-color: #2a2a2a transparent;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
-    h1 {
+    .panel-header {
+      flex: 0 0 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
       font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--subtext);
-      margin-bottom: 14px;
+      flex: 1;
+    }
+
+    .expand-btn {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--subtext);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .expand-btn:hover {
+      background: #1a1a1a;
+      color: var(--text);
+      border-color: #3a3a3a;
+    }
+
+    .expand-btn svg { width: 13px; height: 13px; }
+
+    .scroll-area {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 12px 12px 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #2a2a2a transparent;
     }
 
     .section-label {
@@ -43,28 +82,33 @@
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: #444;
-      margin: 18px 0 8px;
+      margin: 16px 0 8px;
     }
+
+    .section-label:first-child { margin-top: 0; }
 
     .ai-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 13px 14px;
+      padding: 12px 13px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 11px;
       cursor: pointer;
-      text-decoration: none;
       color: var(--text);
-      transition: background 0.15s, border-color 0.15s;
-      margin-bottom: 7px;
+      transition: background 0.15s, border-color 0.15s, transform 0.12s;
+      margin-bottom: 6px;
+      user-select: none;
     }
 
     .ai-card:hover {
       background: var(--card-hover);
-      border-color: rgba(0,212,170,0.25);
+      border-color: rgba(0,212,170,0.22);
+      transform: translateY(-1px);
     }
+
+    .ai-card:active { transform: translateY(0); }
 
     .ai-icon {
       width: 36px;
@@ -73,10 +117,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 17px;
       flex-shrink: 0;
       border: 1px solid #2a2a2a;
       background: #161616;
+      line-height: 1;
     }
 
     .ai-info { flex: 1; min-width: 0; }
@@ -85,6 +130,9 @@
       font-size: 13px;
       font-weight: 500;
       margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .ai-desc {
@@ -110,108 +158,239 @@
     }
 
     .tag.free {
-      background: rgba(255,255,255,0.05);
-      color: #666;
-      border-color: #2a2a2a;
+      background: rgba(255,255,255,0.04);
+      color: #555;
+      border-color: #222;
+    }
+
+    .tag.image {
+      background: rgba(255,150,50,0.1);
+      color: #ff9632;
+      border-color: rgba(255,150,50,0.2);
+    }
+
+    .tag.music {
+      background: rgba(180,100,255,0.1);
+      color: #c46aff;
+      border-color: rgba(180,100,255,0.2);
+    }
+
+    .tag.video {
+      background: rgba(255,80,80,0.1);
+      color: #ff5050;
+      border-color: rgba(255,80,80,0.2);
+    }
+
+    .tag.code {
+      background: rgba(80,180,255,0.1);
+      color: #50b4ff;
+      border-color: rgba(80,180,255,0.2);
+    }
+
+    .tag.ui {
+      background: rgba(255,220,0,0.08);
+      color: #ffcc00;
+      border-color: rgba(255,220,0,0.15);
     }
   </style>
 </head>
 <body>
-  <h1>AI Tools</h1>
 
-  <div class="section-label">Chat</div>
+  <div class="panel-header">
+    <span class="panel-title">AI Tools</span>
+    <button class="expand-btn" id="expand-btn" title="Expand sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+        <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+      </svg>
+    </button>
+  </div>
 
-  <a class="ai-card" data-url="https://chat.openai.com" onclick="nav(event)">
-    <div class="ai-icon">✦</div>
-    <div class="ai-info">
-      <div class="ai-name">ChatGPT</div>
-      <div class="ai-desc">OpenAI's flagship chat assistant</div>
+  <div class="scroll-area">
+
+    <div class="section-label">Chat</div>
+
+    <div class="ai-card" data-url="https://chat.openai.com">
+      <div class="ai-icon">✦</div>
+      <div class="ai-info">
+        <div class="ai-name">ChatGPT</div>
+        <div class="ai-desc">OpenAI's flagship chat assistant</div>
+      </div>
+      <span class="tag">GPT-4o</span>
     </div>
-    <span class="tag">GPT-4o</span>
-  </a>
 
-  <a class="ai-card" data-url="https://claude.ai" onclick="nav(event)">
-    <div class="ai-icon">◈</div>
-    <div class="ai-info">
-      <div class="ai-name">Claude</div>
-      <div class="ai-desc">Anthropic's thoughtful AI assistant</div>
+    <div class="ai-card" data-url="https://claude.ai">
+      <div class="ai-icon">◈</div>
+      <div class="ai-info">
+        <div class="ai-name">Claude</div>
+        <div class="ai-desc">Anthropic's thoughtful AI assistant</div>
+      </div>
+      <span class="tag">Sonnet</span>
     </div>
-    <span class="tag">Sonnet</span>
-  </a>
 
-  <a class="ai-card" data-url="https://gemini.google.com" onclick="nav(event)">
-    <div class="ai-icon">✸</div>
-    <div class="ai-info">
-      <div class="ai-name">Gemini</div>
-      <div class="ai-desc">Google's multimodal AI</div>
+    <div class="ai-card" data-url="https://gemini.google.com">
+      <div class="ai-icon">✸</div>
+      <div class="ai-info">
+        <div class="ai-name">Gemini</div>
+        <div class="ai-desc">Google's multimodal AI</div>
+      </div>
+      <span class="tag free">Free</span>
     </div>
-    <span class="tag free">Free</span>
-  </a>
 
-  <a class="ai-card" data-url="https://www.perplexity.ai" onclick="nav(event)">
-    <div class="ai-icon">⊕</div>
-    <div class="ai-info">
-      <div class="ai-name">Perplexity</div>
-      <div class="ai-desc">AI-powered search and research</div>
+    <div class="ai-card" data-url="https://www.perplexity.ai">
+      <div class="ai-icon">⊕</div>
+      <div class="ai-info">
+        <div class="ai-name">Perplexity</div>
+        <div class="ai-desc">AI-powered search &amp; research</div>
+      </div>
+      <span class="tag free">Free</span>
     </div>
-    <span class="tag free">Free</span>
-  </a>
 
-  <div class="section-label">Create</div>
-
-  <a class="ai-card" data-url="https://www.midjourney.com" onclick="nav(event)">
-    <div class="ai-icon">🎨</div>
-    <div class="ai-info">
-      <div class="ai-name">Midjourney</div>
-      <div class="ai-desc">AI image generation</div>
+    <div class="ai-card" data-url="https://grok.com">
+      <div class="ai-icon">𝕏</div>
+      <div class="ai-info">
+        <div class="ai-name">Grok</div>
+        <div class="ai-desc">xAI's real-time AI by X</div>
+      </div>
+      <span class="tag free">Free</span>
     </div>
-    <span class="tag">Image</span>
-  </a>
 
-  <a class="ai-card" data-url="https://suno.com" onclick="nav(event)">
-    <div class="ai-icon">🎵</div>
-    <div class="ai-info">
-      <div class="ai-name">Suno</div>
-      <div class="ai-desc">Generate music with AI</div>
+    <div class="ai-card" data-url="https://meta.ai">
+      <div class="ai-icon">∞</div>
+      <div class="ai-info">
+        <div class="ai-name">Meta AI</div>
+        <div class="ai-desc">Llama-powered assistant by Meta</div>
+      </div>
+      <span class="tag free">Free</span>
     </div>
-    <span class="tag">Music</span>
-  </a>
 
-  <a class="ai-card" data-url="https://runway.com" onclick="nav(event)">
-    <div class="ai-icon">🎬</div>
-    <div class="ai-info">
-      <div class="ai-name">Runway</div>
-      <div class="ai-desc">AI video generation</div>
+    <div class="section-label">Create</div>
+
+    <div class="ai-card" data-url="https://www.midjourney.com">
+      <div class="ai-icon">🎨</div>
+      <div class="ai-info">
+        <div class="ai-name">Midjourney</div>
+        <div class="ai-desc">AI image generation</div>
+      </div>
+      <span class="tag image">Image</span>
     </div>
-    <span class="tag">Video</span>
-  </a>
 
-  <div class="section-label">Code</div>
-
-  <a class="ai-card" data-url="https://github.com/features/copilot" onclick="nav(event)">
-    <div class="ai-icon">⌥</div>
-    <div class="ai-info">
-      <div class="ai-name">GitHub Copilot</div>
-      <div class="ai-desc">AI pair programmer in your editor</div>
+    <div class="ai-card" data-url="https://openai.com/dall-e-3">
+      <div class="ai-icon">🖼</div>
+      <div class="ai-info">
+        <div class="ai-name">DALL·E 3</div>
+        <div class="ai-desc">OpenAI image generation</div>
+      </div>
+      <span class="tag image">Image</span>
     </div>
-    <span class="tag">Code</span>
-  </a>
 
-  <a class="ai-card" data-url="https://v0.dev" onclick="nav(event)">
-    <div class="ai-icon">▲</div>
-    <div class="ai-info">
-      <div class="ai-name">v0 by Vercel</div>
-      <div class="ai-desc">Generate UI with AI prompts</div>
+    <div class="ai-card" data-url="https://suno.com">
+      <div class="ai-icon">🎵</div>
+      <div class="ai-info">
+        <div class="ai-name">Suno</div>
+        <div class="ai-desc">Generate music with AI</div>
+      </div>
+      <span class="tag music">Music</span>
     </div>
-    <span class="tag">UI</span>
-  </a>
+
+    <div class="ai-card" data-url="https://udio.com">
+      <div class="ai-icon">🎶</div>
+      <div class="ai-info">
+        <div class="ai-name">Udio</div>
+        <div class="ai-desc">Create songs from text prompts</div>
+      </div>
+      <span class="tag music">Music</span>
+    </div>
+
+    <div class="ai-card" data-url="https://runway.com">
+      <div class="ai-icon">🎬</div>
+      <div class="ai-info">
+        <div class="ai-name">Runway</div>
+        <div class="ai-desc">AI video generation</div>
+      </div>
+      <span class="tag video">Video</span>
+    </div>
+
+    <div class="ai-card" data-url="https://www.pika.art">
+      <div class="ai-icon">⚡</div>
+      <div class="ai-info">
+        <div class="ai-name">Pika</div>
+        <div class="ai-desc">Text-to-video AI</div>
+      </div>
+      <span class="tag video">Video</span>
+    </div>
+
+    <div class="section-label">Code</div>
+
+    <div class="ai-card" data-url="https://github.com/features/copilot">
+      <div class="ai-icon">⌥</div>
+      <div class="ai-info">
+        <div class="ai-name">GitHub Copilot</div>
+        <div class="ai-desc">AI pair programmer in your editor</div>
+      </div>
+      <span class="tag code">Code</span>
+    </div>
+
+    <div class="ai-card" data-url="https://v0.dev">
+      <div class="ai-icon">▲</div>
+      <div class="ai-info">
+        <div class="ai-name">v0 by Vercel</div>
+        <div class="ai-desc">Generate UI with AI prompts</div>
+      </div>
+      <span class="tag ui">UI</span>
+    </div>
+
+    <div class="ai-card" data-url="https://cursor.com">
+      <div class="ai-icon">⬡</div>
+      <div class="ai-info">
+        <div class="ai-name">Cursor</div>
+        <div class="ai-desc">AI-first code editor</div>
+      </div>
+      <span class="tag code">Code</span>
+    </div>
+
+    <div class="ai-card" data-url="https://replit.com/ai">
+      <div class="ai-icon">🔁</div>
+      <div class="ai-info">
+        <div class="ai-name">Replit AI</div>
+        <div class="ai-desc">Build &amp; deploy with AI in-browser</div>
+      </div>
+      <span class="tag code">Code</span>
+    </div>
+
+    <div class="section-label">Research</div>
+
+    <div class="ai-card" data-url="https://notebooklm.google.com">
+      <div class="ai-icon">📓</div>
+      <div class="ai-info">
+        <div class="ai-name">NotebookLM</div>
+        <div class="ai-desc">AI research companion by Google</div>
+      </div>
+      <span class="tag free">Free</span>
+    </div>
+
+    <div class="ai-card" data-url="https://elicit.com">
+      <div class="ai-icon">🔬</div>
+      <div class="ai-info">
+        <div class="ai-name">Elicit</div>
+        <div class="ai-desc">AI research tool for papers</div>
+      </div>
+      <span class="tag free">Free</span>
+    </div>
+
+  </div>
 
   <script>
-    function nav(e) {
-      e.preventDefault();
-      const url = e.currentTarget.dataset.url;
-      window.parent.postMessage({ type: 'sidebar-navigate', url }, '*');
-    }
+    document.querySelectorAll('.ai-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const url = card.dataset.url;
+        if (url) window.parent.postMessage({ type: 'navigate', url }, '*');
+      });
+    });
+
+    document.getElementById('expand-btn').addEventListener('click', () => {
+      window.parent.postMessage({ type: 'sidebar-toggle-expand' }, '*');
+    });
   </script>
 </body>
 </html>
