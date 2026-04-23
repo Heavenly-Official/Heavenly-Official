@@ -14,7 +14,7 @@ function openPanel(id) {
   }
 
   activePanelId = id;
-  sidebarFrame.src = '/sidebar/' + id + '.html';
+  sidebarFrame.src = 'public/sidebar/' + id + '.html';
   sidebarPanel.classList.add('open');
   sidebarEl.classList.add('expanded');
 

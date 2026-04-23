@@ -32,27 +32,24 @@ function buildEmbedUrl(input) {
   input = input.trim();
   if (!input) return null;
 
-  if (input === 'newtab') return '/newtab.html';
+  if (input === 'newtab') return 'newtab.html';
 
   if (/^https?:\/\//i.test(input)) {
-    return '/active/embed.html?url=' + encodeURIComponent(input);
+    return input;
   }
 
   if (/^[^\s]+\.[^\s]+$/.test(input) && !input.includes(' ')) {
-    return '/active/embed.html?url=' + encodeURIComponent('https://' + input);
+    return 'https://' + input;
   }
 
-  const searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input);
-  return '/active/embed.html?url=' + encodeURIComponent(searchUrl);
+  return 'https://www.google.com/search?q=' + encodeURIComponent(input);
 }
 
 function getRealUrlFromEmbed(embedSrc) {
   if (!embedSrc) return '';
-  if (embedSrc === '/newtab.html') return 'New Tab';
+  if (embedSrc === 'newtab.html' || /\/newtab\.html$/i.test(embedSrc)) return 'New Tab';
   try {
-    const url = new URL(embedSrc, window.location.origin);
-    const encoded = url.searchParams.get('url');
-    return encoded ? decodeURIComponent(encoded) : embedSrc;
+    return new URL(embedSrc, window.location.href).href;
   } catch (e) {
     return embedSrc;
   }
