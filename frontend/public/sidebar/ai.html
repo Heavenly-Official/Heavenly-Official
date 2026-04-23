@@ -107,69 +107,136 @@
       scrollbar-color: #2a2a2a transparent;
     }
 
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .chat-sidebar {
+      background: #101010;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 200px;
+    }
+
+    .chat-sidebar-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-sidebar-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: #6d6d6d;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .chat-new {
+      border: 1px solid rgba(0, 212, 170, 0.45);
+      background: rgba(0, 212, 170, 0.1);
+      color: #b8f4e5;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .chat-new:hover {
+      background: rgba(0, 212, 170, 0.18);
+      border-color: rgba(0, 212, 170, 0.65);
+    }
+
+    .chat-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow: auto;
+      max-height: 220px;
+      scrollbar-width: thin;
+      scrollbar-color: #2a2a2a transparent;
+      padding-right: 2px;
+    }
+
+    .chat-item {
+      width: 100%;
+      border: 1px solid #262626;
+      border-radius: 9px;
+      padding: 8px;
+      background: #151515;
+      color: #d8d8d8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .chat-item:hover {
+      border-color: #3a3a3a;
+      background: #1a1a1a;
+    }
+
+    .chat-item.active {
+      border-color: rgba(0, 212, 170, 0.55);
+      background: #13221d;
+      color: #d8f7ef;
+    }
+
+    .chat-item-title {
+      flex: 1;
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+    }
+
+    .chat-delete {
+      border: none;
+      background: transparent;
+      color: #7a7a7a;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .chat-delete:hover {
+      background: rgba(255, 102, 102, 0.16);
+      color: #ffbebe;
+    }
+
+    .chat-empty {
+      border: 1px dashed #2d2d2d;
+      border-radius: 9px;
+      padding: 12px;
+      text-align: center;
+      font-size: 11px;
+      color: #6d6d6d;
+    }
+
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 12px;
-    }
-
-    .status-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .status-title {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-    }
-
-    .status-badge {
-      font-size: 9px;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: var(--accent);
-      background: var(--accent-soft);
-      border: 1px solid rgba(0, 212, 170, 0.25);
-      border-radius: 999px;
-      padding: 3px 7px;
-      white-space: nowrap;
-    }
-
-    .status-desc {
-      font-size: 11px;
-      color: var(--subtext);
-      line-height: 1.4;
-    }
-
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 7px;
-      margin-top: 10px;
-    }
-
-    .quick-btn {
-      background: var(--card-soft);
-      border: 1px solid #242424;
-      border-radius: 9px;
-      color: var(--text);
-      font-size: 11px;
-      font-weight: 500;
-      padding: 9px 8px;
-      text-align: left;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-    }
-
-    .quick-btn:hover {
-      border-color: rgba(0, 212, 170, 0.35);
-      background: #171717;
     }
 
     .section-label {
@@ -337,6 +404,16 @@
       border-color: rgba(255, 102, 102, 0.6);
       color: #ffd0d0;
     }
+
+    @media (min-width: 440px) {
+      .layout {
+        grid-template-columns: 180px minmax(0, 1fr);
+      }
+
+      .chat-list {
+        max-height: 360px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -357,42 +434,33 @@
   </div>
 
   <div class="scroll-area">
-    <section class="card">
-      <div class="status-row">
-        <p class="status-title">Heavenly Core</p>
-        <span class="status-badge">Local Prototype</span>
-      </div>
-      <p class="status-desc">
-        No vendor list. No outbound shortcuts. This panel is now your own AI surface that runs directly in the product UI.
-      </p>
-      <div class="quick-actions">
-        <button class="quick-btn" data-prompt="Create a launch checklist for this project.">Project plan</button>
-        <button class="quick-btn" data-prompt="Summarize this page into three bullet points.">Summarize page</button>
-        <button class="quick-btn" data-prompt="Suggest a cleaner component structure for a sidebar app.">Architecture ideas</button>
-        <button class="quick-btn" data-prompt="Generate test cases for a browser-style tab manager.">Test cases</button>
-      </div>
-    </section>
+    <section class="layout">
+      <aside class="chat-sidebar">
+        <div class="chat-sidebar-head">
+          <p class="chat-sidebar-title">Chats</p>
+          <button class="chat-new" id="new-chat-btn" type="button">New</button>
+        </div>
+        <ul class="chat-list" id="chat-list"></ul>
+        <div class="chat-empty" id="chat-empty">No chats yet. Create one.</div>
+      </aside>
 
-    <section class="card chat-wrap">
-      <p class="section-label">Chat</p>
-      <div class="chat-log" id="chat-log">
-        <article class="msg assistant">
-          Heavenly AI online. Ask for planning, coding help, or quick product decisions.
-        </article>
-      </div>
+      <div class="card chat-wrap">
+        <p class="section-label" id="chat-heading">Chat</p>
+        <div class="chat-log" id="chat-log"></div>
 
-      <div class="typing" id="typing-indicator" aria-live="polite">
-        <i></i><i></i><i></i>
-        <span>Heavenly AI is thinking...</span>
-      </div>
+        <div class="typing" id="typing-indicator" aria-live="polite">
+          <i></i><i></i><i></i>
+          <span>Heavenly AI is thinking...</span>
+        </div>
 
-      <div class="composer">
-        <textarea id="chat-input" placeholder="Type a request for your in-house AI..."></textarea>
-        <div class="composer-controls">
-          <span class="hint">Press Ctrl+Enter to send</span>
-          <div class="btn-row">
-            <button class="btn clear" id="clear-btn" type="button">Clear</button>
-            <button class="btn primary" id="send-btn" type="button">Send</button>
+        <div class="composer">
+          <textarea id="chat-input" placeholder="Type a request for your in-house AI..."></textarea>
+          <div class="composer-controls">
+            <span class="hint">Press Ctrl+Enter to send</span>
+            <div class="btn-row">
+              <button class="btn clear" id="clear-btn" type="button">Clear</button>
+              <button class="btn primary" id="send-btn" type="button">Send</button>
+            </div>
           </div>
         </div>
       </div>
@@ -401,11 +469,29 @@
 
   <script>
     const chatLog = document.getElementById('chat-log');
+    const chatList = document.getElementById('chat-list');
+    const chatEmpty = document.getElementById('chat-empty');
+    const chatHeading = document.getElementById('chat-heading');
+    const newChatBtn = document.getElementById('new-chat-btn');
     const chatInput = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
     const clearBtn = document.getElementById('clear-btn');
     const typingIndicator = document.getElementById('typing-indicator');
-    const quickButtons = document.querySelectorAll('.quick-btn');
+
+    let chatCounter = 2;
+    let activeChatId = 'chat-1';
+    const chats = [
+      {
+        id: 'chat-1',
+        title: 'Welcome chat',
+        messages: [
+          {
+            role: 'assistant',
+            content: 'Heavenly AI online. Ask for planning, coding help, or quick product decisions.'
+          }
+        ]
+      }
+    ];
 
     const cannedResponses = [
       {
@@ -426,11 +512,118 @@
       }
     ];
 
+    function createChat() {
+      const id = 'chat-' + chatCounter;
+      chatCounter += 1;
+
+      const chat = {
+        id,
+        title: 'New chat ' + (chatCounter - 1),
+        messages: [
+          {
+            role: 'assistant',
+            content: 'New chat created. What do you want to build next?'
+          }
+        ]
+      };
+
+      chats.unshift(chat);
+      setActiveChat(chat.id);
+      renderChatList();
+      renderMessages();
+    }
+
+    function setActiveChat(chatId) {
+      activeChatId = chatId;
+      renderChatList();
+      renderMessages();
+    }
+
+    function deleteChat(chatId) {
+      const index = chats.findIndex(chat => chat.id === chatId);
+      if (index === -1) return;
+
+      chats.splice(index, 1);
+
+      if (!chats.length) {
+        createChat();
+        return;
+      }
+
+      if (activeChatId === chatId) {
+        activeChatId = chats[0].id;
+      }
+
+      renderChatList();
+      renderMessages();
+    }
+
+    function getActiveChat() {
+      return chats.find(chat => chat.id === activeChatId) || chats[0];
+    }
+
+    function renderChatList() {
+      chatList.innerHTML = '';
+
+      chats.forEach(chat => {
+        const li = document.createElement('li');
+        const item = document.createElement('div');
+        item.className = 'chat-item' + (chat.id === activeChatId ? ' active' : '');
+        item.setAttribute('role', 'button');
+        item.setAttribute('tabindex', '0');
+
+        const title = document.createElement('span');
+        title.className = 'chat-item-title';
+        title.textContent = chat.title;
+
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'chat-delete';
+        del.setAttribute('aria-label', 'Delete chat');
+        del.textContent = 'x';
+        del.addEventListener('click', event => {
+          event.stopPropagation();
+          deleteChat(chat.id);
+        });
+
+        item.appendChild(title);
+        item.appendChild(del);
+        item.addEventListener('click', () => setActiveChat(chat.id));
+        item.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            setActiveChat(chat.id);
+          }
+        });
+        li.appendChild(item);
+        chatList.appendChild(li);
+      });
+
+      chatEmpty.style.display = chats.length ? 'none' : 'block';
+    }
+
     function addMessage(content, role) {
-      const node = document.createElement('article');
-      node.className = 'msg ' + role;
-      node.textContent = content;
-      chatLog.appendChild(node);
+      const active = getActiveChat();
+      active.messages.push({ role, content });
+      if (role === 'user' && active.title.startsWith('New chat')) {
+        active.title = content.slice(0, 24) || 'Untitled chat';
+      }
+      renderChatList();
+      renderMessages();
+    }
+
+    function renderMessages() {
+      const active = getActiveChat();
+      chatLog.innerHTML = '';
+
+      active.messages.forEach(message => {
+        const node = document.createElement('article');
+        node.className = 'msg ' + message.role;
+        node.textContent = message.content;
+        chatLog.appendChild(node);
+      });
+
+      chatHeading.textContent = active.title;
       chatLog.scrollTop = chatLog.scrollHeight;
     }
 
@@ -465,20 +658,24 @@
     });
 
     clearBtn.addEventListener('click', () => {
-      chatLog.innerHTML = '';
-      addMessage('Conversation cleared. Heavenly AI is ready for a new task.', 'assistant');
+      const active = getActiveChat();
+      active.messages = [
+        {
+          role: 'assistant',
+          content: 'Conversation cleared. Heavenly AI is ready for a new task.'
+        }
+      ];
+      renderMessages();
     });
 
-    quickButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        chatInput.value = button.dataset.prompt || '';
-        chatInput.focus();
-      });
-    });
+    newChatBtn.addEventListener('click', createChat);
 
     document.getElementById('expand-btn').addEventListener('click', () => {
       window.parent.postMessage({ type: 'sidebar-toggle-expand' }, '*');
     });
+
+    renderChatList();
+    renderMessages();
   </script>
 </body>
 </html>
