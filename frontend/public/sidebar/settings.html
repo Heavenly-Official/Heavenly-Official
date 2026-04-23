@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --card: #111111;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --subtext: #666;
+      --input-bg: #161616;
+      --accent: #ffffff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 16px 12px;
+      scrollbar-width: thin;
+      scrollbar-color: #2a2a2a transparent;
+    }
+
+    h1 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--subtext);
+      margin-bottom: 14px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #444;
+      margin: 20px 0 10px;
+    }
+
+    .section-label:first-of-type { margin-top: 4px; }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 6px;
+      gap: 12px;
+    }
+
+    .setting-label {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text);
+    }
+
+    .setting-sub {
+      font-size: 11px;
+      color: var(--subtext);
+      margin-top: 2px;
+    }
+
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #2a2a2a;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: 1px solid #333;
+    }
+
+    .toggle input:checked + .toggle-track {
+      background: #fff;
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      background: #666;
+      border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+      pointer-events: none;
+    }
+
+    .toggle input:checked ~ .toggle-thumb {
+      transform: translateX(16px);
+      background: #0a0a0a;
+    }
+
+    select, input[type="text"] {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-size: 12px;
+      font-family: inherit;
+      padding: 5px 9px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    input[type="text"] {
+      width: 140px;
+    }
+
+    .home-input-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 6px;
+      gap: 12px;
+    }
+
+    .save-btn {
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      font-family: inherit;
+    }
+
+    .save-btn:hover { opacity: 0.85; }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+      border-radius: 1px;
+    }
+
+    .search-engine-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .engine-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 11px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      font-size: 12px;
+      color: var(--subtext);
+    }
+
+    .engine-option.active {
+      border-color: rgba(255,255,255,0.3);
+      color: var(--text);
+      background: #161616;
+    }
+
+    .engine-option:hover {
+      border-color: rgba(255,255,255,0.15);
+      background: #141414;
+    }
+
+    .engine-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1.5px solid #444;
+      flex-shrink: 0;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .engine-option.active .engine-dot {
+      background: #fff;
+      border-color: #fff;
+    }
+
+    .version-info {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 10px;
+      color: #333;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Settings</h1>
+
+  <div class="section-label">Search Engine</div>
+  <div class="search-engine-grid" id="engine-grid">
+    <div class="engine-option active" data-engine="google" onclick="setEngine(this)">
+      <div class="engine-dot"></div> Google
+    </div>
+    <div class="engine-option" data-engine="bing" onclick="setEngine(this)">
+      <div class="engine-dot"></div> Bing
+    </div>
+    <div class="engine-option" data-engine="duckduckgo" onclick="setEngine(this)">
+      <div class="engine-dot"></div> DuckDuckGo
+    </div>
+    <div class="engine-option" data-engine="brave" onclick="setEngine(this)">
+      <div class="engine-dot"></div> Brave
+    </div>
+  </div>
+
+  <div class="section-label">Home Page</div>
+  <div class="home-input-row">
+    <div>
+      <div class="setting-label">Home URL</div>
+      <div class="setting-sub">Shown when clicking home</div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <input type="text" id="home-url" placeholder="newtab" />
+      <button class="save-btn" onclick="saveHome()">Save</button>
+    </div>
+  </div>
+
+  <div class="section-label">Appearance</div>
+
+  <div class="setting-row">
+    <div>
+      <div class="setting-label">Show home button</div>
+      <div class="setting-sub">Display home in toolbar</div>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="toggle-home" onchange="savePref('showHome', this.checked)" />
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+  </div>
+
+  <div class="setting-row">
+    <div>
+      <div class="setting-label">Tab favicon</div>
+      <div class="setting-sub">Show site icons in tabs</div>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="toggle-favicon" checked onchange="savePref('showFavicon', this.checked)" />
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+  </div>
+
+  <div class="setting-row">
+    <div>
+      <div class="setting-label">Focus address on new tab</div>
+      <div class="setting-sub">Auto-select address bar</div>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="toggle-focus" checked onchange="savePref('focusAddress', this.checked)" />
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+  </div>
+
+  <div class="section-label">Privacy</div>
+
+  <div class="setting-row">
+    <div>
+      <div class="setting-label">Send search suggestions</div>
+      <div class="setting-sub">As you type in the address bar</div>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="toggle-suggest" onchange="savePref('searchSuggest', this.checked)" />
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+  </div>
+
+  <div class="setting-row" style="cursor:pointer;" onclick="clearHistory()">
+    <div>
+      <div class="setting-label">Clear browsing data</div>
+      <div class="setting-sub">Clears stored preferences</div>
+    </div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+
+  <div class="version-info">Heavenly Browser · v1.0.0</div>
+
+  <script>
+    const ENGINES = {
+      google: 'https://www.google.com/search?q=',
+      bing: 'https://www.bing.com/search?q=',
+      duckduckgo: 'https://duckduckgo.com/?q=',
+      brave: 'https://search.brave.com/search?q='
+    };
+
+    function load() {
+      const prefs = getPrefs();
+
+      const engineEls = document.querySelectorAll('.engine-option');
+      engineEls.forEach(el => {
+        el.classList.toggle('active', el.dataset.engine === (prefs.engine || 'google'));
+      });
+
+      if (prefs.homeUrl) document.getElementById('home-url').value = prefs.homeUrl;
+      document.getElementById('toggle-home').checked = prefs.showHome ?? false;
+      document.getElementById('toggle-favicon').checked = prefs.showFavicon ?? true;
+      document.getElementById('toggle-focus').checked = prefs.focusAddress ?? true;
+      document.getElementById('toggle-suggest').checked = prefs.searchSuggest ?? false;
+    }
+
+    function getPrefs() {
+      try { return JSON.parse(localStorage.getItem('heavenly_prefs') || '{}'); } catch { return {}; }
+    }
+
+    function savePrefs(prefs) {
+      localStorage.setItem('heavenly_prefs', JSON.stringify(prefs));
+      window.parent.postMessage({ type: 'prefs-updated', prefs }, '*');
+    }
+
+    function setEngine(el) {
+      document.querySelectorAll('.engine-option').forEach(e => e.classList.remove('active'));
+      el.classList.add('active');
+      const prefs = getPrefs();
+      prefs.engine = el.dataset.engine;
+      savePrefs(prefs);
+    }
+
+    function savePref(key, value) {
+      const prefs = getPrefs();
+      prefs[key] = value;
+      savePrefs(prefs);
+    }
+
+    function saveHome() {
+      const val = document.getElementById('home-url').value.trim();
+      const prefs = getPrefs();
+      prefs.homeUrl = val || 'newtab';
+      savePrefs(prefs);
+    }
+
+    function clearHistory() {
+      if (confirm('Clear all Heavenly preferences?')) {
+        localStorage.removeItem('heavenly_prefs');
+        load();
+        window.parent.postMessage({ type: 'prefs-cleared' }, '*');
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>
