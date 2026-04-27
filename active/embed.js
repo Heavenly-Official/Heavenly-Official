@@ -15,22 +15,38 @@ try {
   throw err;
 }
 
-// Try UV proxy first
-registerSW()
-  .then(() => {
-    const proxiedUrl = __uv$config.prefix + __uv$config.encodeUrl(destination);
-    window.location.href = proxiedUrl;
-  })
-  .catch((err) => {
-    console.warn("Service worker registration failed, trying direct iframe:", err);
-    // Fallback: Try opening with iframe
-    setTimeout(() => {
-      const iframe = document.createElement("iframe");
-      iframe.style.width = "100%";
-      iframe.style.height = "100%";
-      iframe.style.border = "none";
-      iframe.src = destination;
-      document.body.innerHTML = "";
-      document.body.appendChild(iframe);
-    }, 500);
-  });
+// Load directly in iframe (bypass UV proxy due to CORS limitations)
+window.addEventListener('DOMContentLoaded', () => {
+  const iframe = document.createElement("iframe");
+  iframe.style.width = "100%";
+  iframe.style.height = "100%";
+  iframe.style.border = "none";
+  iframe.style.display = "block";
+  iframe.style.position = "absolute";
+  iframe.style.top = "0";
+  iframe.style.left = "0";
+  iframe.src = destination;
+  
+  // Remove loading box
+  const loadingBox = document.getElementById('loadingbox');
+  if (loadingBox) loadingBox.style.display = 'none';
+  
+  // Add iframe
+  document.body.appendChild(iframe);
+});
+
+// Also try immediate load
+const iframe = document.createElement("iframe");
+iframe.style.width = "100%";
+iframe.style.height = "100%";
+iframe.style.border = "none";
+iframe.style.display = "block";
+iframe.style.position = "absolute";
+iframe.style.top = "0";
+iframe.style.left = "0";
+iframe.src = destination;
+
+const loadingBox = document.getElementById('loadingbox');
+if (loadingBox) loadingBox.style.display = 'none';
+
+document.body.appendChild(iframe);
