@@ -44,7 +44,7 @@ function buildEmbedUrl(input) {
     targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input);
   }
 
-  return '../active/embed.html?url=' + encodeURIComponent(targetUrl);
+  return '/active/embed.html?url=' + encodeURIComponent(targetUrl);
 }
 
 function getRealUrlFromEmbed(embedSrc) {
@@ -53,7 +53,7 @@ function getRealUrlFromEmbed(embedSrc) {
 
   try {
     const parsed = new URL(embedSrc, window.location.href);
-    if (/\/active\/embed\.html$/i.test(parsed.pathname)) {
+    if (/\/active\/embed\.html$/i.test(parsed.pathname) || /embed\.html$/i.test(parsed.pathname)) {
       const original = parsed.searchParams.get('url');
       return original || '';
     }
