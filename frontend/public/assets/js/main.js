@@ -41,7 +41,7 @@ function buildEmbedUrl(input) {
   } else if (/^[^\s]+\.[^\s]+$/.test(input) && !input.includes(' ')) {
     targetUrl = 'https://' + input;
   } else {
-    targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input);
+    targetUrl = 'https://duckduckgo.com/?q=' + encodeURIComponent(input);
   }
 
   return '/active/embed.html?url=' + encodeURIComponent(targetUrl);
