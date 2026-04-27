@@ -34,22 +34,34 @@ function buildEmbedUrl(input) {
 
   if (input === 'newtab') return 'newtab.html';
 
+  let targetUrl = '';
+
   if (/^https?:\/\//i.test(input)) {
-    return input;
+    targetUrl = input;
+  } else if (/^[^\s]+\.[^\s]+$/.test(input) && !input.includes(' ')) {
+    targetUrl = 'https://' + input;
+  } else {
+    targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input);
   }
 
-  if (/^[^\s]+\.[^\s]+$/.test(input) && !input.includes(' ')) {
-    return 'https://' + input;
-  }
-
-  return 'https://www.google.com/search?q=' + encodeURIComponent(input);
+  return '../active/embed.html?url=' + encodeURIComponent(targetUrl);
 }
 
 function getRealUrlFromEmbed(embedSrc) {
   if (!embedSrc) return '';
   if (embedSrc === 'newtab.html' || /\/newtab\.html$/i.test(embedSrc)) return 'New Tab';
+
   try {
-    return new URL(embedSrc, window.location.href).href;
+    const parsed = new URL(embedSrc, window.location.href);
+    if (/\/active\/embed\.html$/i.test(parsed.pathname)) {
+      const original = parsed.searchParams.get('url');
+      return original || '';
+    }
+    return parsed.href;
+  } catch (e) {}
+
+  try {
+    return decodeURIComponent(embedSrc);
   } catch (e) {
     return embedSrc;
   }
