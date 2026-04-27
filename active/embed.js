@@ -11,14 +11,26 @@ if (!destination) {
 try {
   destination = new URL(destination).toString();
 } catch (err) {
-  alert(`Your boat crashed!\nInvalid URL:\n${err}`);
+  alert(`Invalid URL:\n${err}`);
   throw err;
 }
 
+// Try UV proxy first
 registerSW()
   .then(() => {
-    window.open(__uv$config.prefix + __uv$config.encodeUrl(destination), "_self");
+    const proxiedUrl = __uv$config.prefix + __uv$config.encodeUrl(destination);
+    window.location.href = proxiedUrl;
   })
   .catch((err) => {
-    alert(`Your boat crashed!\nAn error occurred:\n${err}`);
+    console.warn("Service worker registration failed, trying direct iframe:", err);
+    // Fallback: Try opening with iframe
+    setTimeout(() => {
+      const iframe = document.createElement("iframe");
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      iframe.src = destination;
+      document.body.innerHTML = "";
+      document.body.appendChild(iframe);
+    }, 500);
   });
