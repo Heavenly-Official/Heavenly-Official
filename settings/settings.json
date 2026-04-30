@@ -1,0 +1,204 @@
+{
+  "themes": [
+    {
+      "id": "dark",
+      "name": "Dark",
+      "vars": {
+        "--bg": "#0a0a0a",
+        "--tab-bar-bg": "#111111",
+        "--tab-active": "#1a1a1a",
+        "--tab-inactive": "#0d0d0d",
+        "--toolbar-bg": "#111111",
+        "--address-bg": "#1a1a1a",
+        "--text": "#e8e8e8",
+        "--subtext": "#666666",
+        "--accent": "#ffffff",
+        "--border": "#2a2a2a",
+        "--hover": "#222222",
+        "--card-bg": "#111111",
+        "--card-hover": "#181818",
+        "--input-bg": "#141414"
+      }
+    },
+    {
+      "id": "darker",
+      "name": "Darker",
+      "vars": {
+        "--bg": "#050505",
+        "--tab-bar-bg": "#080808",
+        "--tab-active": "#111111",
+        "--tab-inactive": "#060606",
+        "--toolbar-bg": "#080808",
+        "--address-bg": "#111111",
+        "--text": "#d4d4d4",
+        "--subtext": "#555555",
+        "--accent": "#cccccc",
+        "--border": "#1e1e1e",
+        "--hover": "#141414",
+        "--card-bg": "#0d0d0d",
+        "--card-hover": "#121212",
+        "--input-bg": "#0a0a0a"
+      }
+    },
+    {
+      "id": "midnight",
+      "name": "Midnight",
+      "vars": {
+        "--bg": "#0d0d1a",
+        "--tab-bar-bg": "#12122a",
+        "--tab-active": "#1a1a3a",
+        "--tab-inactive": "#0f0f20",
+        "--toolbar-bg": "#12122a",
+        "--address-bg": "#1a1a3a",
+        "--text": "#e0e0ff",
+        "--subtext": "#6060aa",
+        "--accent": "#8888ff",
+        "--border": "#2a2a4a",
+        "--hover": "#20203a",
+        "--card-bg": "#12122a",
+        "--card-hover": "#18183a",
+        "--input-bg": "#141430"
+      }
+    },
+    {
+      "id": "nord",
+      "name": "Nord",
+      "vars": {
+        "--bg": "#2e3440",
+        "--tab-bar-bg": "#3b4252",
+        "--tab-active": "#434c5e",
+        "--tab-inactive": "#373e4d",
+        "--toolbar-bg": "#3b4252",
+        "--address-bg": "#434c5e",
+        "--text": "#eceff4",
+        "--subtext": "#8895a7",
+        "--accent": "#88c0d0",
+        "--border": "#4c566a",
+        "--hover": "#3d4455",
+        "--card-bg": "#3b4252",
+        "--card-hover": "#434c5e",
+        "--input-bg": "#3d4455"
+      }
+    },
+    {
+      "id": "dracula",
+      "name": "Dracula",
+      "vars": {
+        "--bg": "#282a36",
+        "--tab-bar-bg": "#21222c",
+        "--tab-active": "#44475a",
+        "--tab-inactive": "#2a2c3a",
+        "--toolbar-bg": "#21222c",
+        "--address-bg": "#44475a",
+        "--text": "#f8f8f2",
+        "--subtext": "#6272a4",
+        "--accent": "#bd93f9",
+        "--border": "#44475a",
+        "--hover": "#373843",
+        "--card-bg": "#21222c",
+        "--card-hover": "#2d2f3f",
+        "--input-bg": "#2a2c3a"
+      }
+    },
+    {
+      "id": "solarized",
+      "name": "Solarized Dark",
+      "vars": {
+        "--bg": "#002b36",
+        "--tab-bar-bg": "#073642",
+        "--tab-active": "#0a4a5a",
+        "--tab-inactive": "#073242",
+        "--toolbar-bg": "#073642",
+        "--address-bg": "#0a4a5a",
+        "--text": "#fdf6e3",
+        "--subtext": "#586e75",
+        "--accent": "#268bd2",
+        "--border": "#10505e",
+        "--hover": "#0a4252",
+        "--card-bg": "#073642",
+        "--card-hover": "#0a4a5a",
+        "--input-bg": "#083848"
+      }
+    },
+    {
+      "id": "monokai",
+      "name": "Monokai",
+      "vars": {
+        "--bg": "#272822",
+        "--tab-bar-bg": "#1e1f1c",
+        "--tab-active": "#383830",
+        "--tab-inactive": "#222320",
+        "--toolbar-bg": "#1e1f1c",
+        "--address-bg": "#383830",
+        "--text": "#f8f8f2",
+        "--subtext": "#75715e",
+        "--accent": "#a6e22e",
+        "--border": "#3e3d32",
+        "--hover": "#32332c",
+        "--card-bg": "#1e1f1c",
+        "--card-hover": "#2a2b26",
+        "--input-bg": "#252620"
+      }
+    },
+    {
+      "id": "onedark",
+      "name": "One Dark",
+      "vars": {
+        "--bg": "#282c34",
+        "--tab-bar-bg": "#21252b",
+        "--tab-active": "#2c313c",
+        "--tab-inactive": "#252930",
+        "--toolbar-bg": "#21252b",
+        "--address-bg": "#2c313c",
+        "--text": "#abb2bf",
+        "--subtext": "#5c6370",
+        "--accent": "#61afef",
+        "--border": "#3e4451",
+        "--hover": "#2c303a",
+        "--card-bg": "#21252b",
+        "--card-hover": "#292e38",
+        "--input-bg": "#23272e"
+      }
+    },
+    {
+      "id": "catppuccin",
+      "name": "Catppuccin Mocha",
+      "vars": {
+        "--bg": "#1e1e2e",
+        "--tab-bar-bg": "#181825",
+        "--tab-active": "#313244",
+        "--tab-inactive": "#1e1e2e",
+        "--toolbar-bg": "#181825",
+        "--address-bg": "#313244",
+        "--text": "#cdd6f4",
+        "--subtext": "#6c7086",
+        "--accent": "#cba6f7",
+        "--border": "#45475a",
+        "--hover": "#2a2a3c",
+        "--card-bg": "#181825",
+        "--card-hover": "#242435",
+        "--input-bg": "#1e1e2e"
+      }
+    },
+    {
+      "id": "gruvbox",
+      "name": "Gruvbox",
+      "vars": {
+        "--bg": "#282828",
+        "--tab-bar-bg": "#1d2021",
+        "--tab-active": "#3c3836",
+        "--tab-inactive": "#282828",
+        "--toolbar-bg": "#1d2021",
+        "--address-bg": "#3c3836",
+        "--text": "#ebdbb2",
+        "--subtext": "#7c6f64",
+        "--accent": "#d79921",
+        "--border": "#504945",
+        "--hover": "#32302f",
+        "--card-bg": "#1d2021",
+        "--card-hover": "#282828",
+        "--input-bg": "#252423"
+      }
+    }
+  ]
+}
