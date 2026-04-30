@@ -32,6 +32,7 @@ const HEAVENLY_PAGES = {
   'games':    '/games/g.html',
   'ai':       '/ai/ai.html',
   'settings': '/settings/settings.html',
+  'popup':    '/popup.html',
 };
 
 function buildEmbedUrl(input) {
@@ -52,7 +53,8 @@ function buildEmbedUrl(input) {
   } else if (/^[^\s]+\.[^\s]+$/.test(input) && !input.includes(' ')) {
     targetUrl = 'https://' + input;
   } else {
-    targetUrl = 'https://duckduckgo.com/?q=' + encodeURIComponent(input);
+    const engine = loadSetting('engine', 'https://duckduckgo.com/?q=');
+    targetUrl = engine + encodeURIComponent(input);
   }
 
   return '/active/embed.html?url=' + encodeURIComponent(targetUrl);
@@ -382,15 +384,195 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// ── Theme helpers ──────────────────────────────────────
+function loadSetting(key, def) {
+  try { return localStorage.getItem('heavenly_settings_' + key) ?? def; } catch(e) { return def; }
+}
+
+function applyThemeVars(vars) {
+  const root = document.documentElement;
+  Object.entries(vars).forEach(([k, v]) => root.style.setProperty(k, v));
+}
+
+async function applySavedTheme() {
+  const savedId = loadSetting('theme', 'dark');
+  try {
+    const res  = await fetch('/settings/settings.json');
+    const data = await res.json();
+    const theme = (data.themes || []).find(t => t.id === savedId);
+    if (theme) applyThemeVars(theme.vars);
+  } catch(e) {}
+}
+
+// ── Popup overlay ──────────────────────────────────────
+function showStartupPopup() {
+  const seen = sessionStorage.getItem('heavenly_popup_shown');
+  if (seen) return;
+  sessionStorage.setItem('heavenly_popup_shown', '1');
+
+  const overlay = document.createElement('div');
+  overlay.id = 'popup-overlay';
+  overlay.style.cssText = `
+    position: fixed; inset: 0; z-index: 9999;
+    pointer-events: none;
+    display: flex; flex-direction: column;
+    align-items: flex-end; justify-content: flex-end;
+    padding: 24px; gap: 12px;
+  `;
+  document.body.appendChild(overlay);
+
+  const msgs = [
+    {
+      icon: 'sparkles',
+      title: 'Heavenly',
+      sub: '1 of 3',
+      counter: '1/3 popups remaining',
+      text: 'To get to Games, AI &amp; Settings, type <b>heavenly://games</b>, <b>heavenly://ai</b>, or <b>heavenly://settings</b> in the address bar.',
+    },
+    {
+      icon: 'star',
+      title: 'Heavenly Premium',
+      sub: '2 of 3',
+      counter: '2/3 popups remaining',
+      text: 'Unlock the full Heavenly experience. Visit <b>heavenly://premium</b> to purchase our premium plan.',
+    },
+    {
+      icon: 'heart',
+      title: 'Support Us',
+      sub: '3 of 3',
+      counter: '3/3',
+      text: 'Love Heavenly? Support us on CashApp: <b>$OhheyElijah</b> 💚',
+    },
+  ];
+
+  const cards = [];
+
+  msgs.forEach((m, i) => {
+    const card = document.createElement('div');
+    card.style.cssText = `
+      width: 300px;
+      background: #202123;
+      border: 1px solid #3a3a3a;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      opacity: 0;
+      transform: translateY(16px) scale(0.96);
+      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      pointer-events: all;
+    `;
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid #2f2f2f">
+        <div style="width:28px;height:28px;border-radius:50%;background:#10a37f;display:flex;align-items:center;justify-content:center;flex:0 0 28px">
+          <i data-lucide="${m.icon}" style="width:14px;height:14px;color:#fff"></i>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#ececec;font-family:inherit">${m.title}</div>
+          <div style="font-size:11px;color:#8e8ea0;font-family:inherit">${m.sub}</div>
+        </div>
+        <button data-close style="margin-left:auto;width:22px;height:22px;border-radius:5px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#8e8ea0">
+          <i data-lucide="x" style="width:13px;height:13px"></i>
+        </button>
+      </div>
+      <div style="padding:14px 16px 8px;min-height:72px;display:flex;flex-direction:column;justify-content:center">
+        <div class="hpopup-loader" style="display:flex;gap:5px;align-items:center;padding:4px 0">
+          <div style="width:7px;height:7px;border-radius:50%;background:#8e8ea0;animation:hbounce 1.2s ease-in-out infinite 0s"></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#8e8ea0;animation:hbounce 1.2s ease-in-out infinite 0.2s"></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#8e8ea0;animation:hbounce 1.2s ease-in-out infinite 0.4s"></div>
+        </div>
+        <div class="hpopup-msg" style="font-size:13px;line-height:1.6;color:#d1d5db;display:none;font-family:inherit">${m.text}</div>
+      </div>
+      <div style="padding:0 16px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:10px;color:#555;font-family:inherit">${m.counter}</span>
+      </div>
+    `;
+    overlay.appendChild(card);
+    cards.push(card);
+
+    card.querySelector('[data-close]').addEventListener('click', () => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(8px) scale(0.97)';
+      setTimeout(() => card.remove(), 350);
+    });
+  });
+
+  // Inject animation keyframes once
+  if (!document.getElementById('hpopup-style')) {
+    const style = document.createElement('style');
+    style.id = 'hpopup-style';
+    style.textContent = `@keyframes hbounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}`;
+    document.head.appendChild(style);
+  }
+
+  function revealCard(idx, delay) {
+    setTimeout(() => {
+      const card = cards[idx];
+      if (!card) return;
+      requestAnimationFrame(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0) scale(1)';
+      });
+      setTimeout(() => {
+        const loader = card.querySelector('.hpopup-loader');
+        const msg    = card.querySelector('.hpopup-msg');
+        if (loader) loader.style.display = 'none';
+        if (msg) msg.style.display = 'block';
+        lucide.createIcons({ nodes: [card] });
+      }, 1200);
+    }, delay);
+  }
+
+  lucide.createIcons({ nodes: [overlay] });
+
+  revealCard(0, 500);
+  revealCard(1, 3700);
+  revealCard(2, 6900);
+}
+
+// ── Message listener ───────────────────────────────────
 window.addEventListener('message', (e) => {
-  if (!e.data || e.data.type !== 'navigate') return;
-  const tab = getActiveTab();
-  if (!tab) return;
-  const url = e.data.url;
-  if (!url) return;
-  navigate(url, tab);
+  if (!e.data) return;
+
+  const { type } = e.data;
+
+  if (type === 'navigate') {
+    const tab = getActiveTab();
+    if (!tab) return;
+    const url = e.data.url;
+    if (!url || typeof url !== 'string') return;
+    // Validate: only allow safe URL schemes and Heavenly internal pages
+    if (/^javascript:/i.test(url.trim())) return;
+    navigate(url, tab);
+    return;
+  }
+
+  if (type === 'theme' && e.data.vars) {
+    applyThemeVars(e.data.vars);
+    return;
+  }
+
+  if (type === 'font_size') {
+    const sizes = { small: '12px', medium: '13px', large: '15px' };
+    document.documentElement.style.fontSize = sizes[e.data.value] || '13px';
+    return;
+  }
+
+  if (type === 'search_engine') {
+    try { localStorage.setItem('heavenly_settings_engine', e.data.value); } catch(err) {}
+    return;
+  }
+
+  if (type === 'clear_data') {
+    try {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('heavenly_'))
+        .forEach(k => localStorage.removeItem(k));
+    } catch(err) {}
+    return;
+  }
 });
 
+// ── Drag-to-reorder tabs ───────────────────────────────
 let dragSrcId = null;
 
 tabsContainer.addEventListener('dragstart', (e) => {
@@ -443,4 +625,8 @@ tabsContainer.addEventListener('mouseup', (e) => {
 
 lucide.createIcons();
 
+// ── Boot ───────────────────────────────────────────────
+applySavedTheme();
 createTab('newtab');
+showStartupPopup();
+
