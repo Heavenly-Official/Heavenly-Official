@@ -19,22 +19,23 @@
       flex-direction: column;
       align-items: flex-end;
       justify-content: flex-end;
-      padding: 24px;
-      gap: 12px;
+      padding: 20px;
+      gap: 10px;
     }
 
     .popup-card {
-      width: 300px;
-      background: #202123;
-      border: 1px solid #3a3a3a;
-      border-radius: 14px;
-      padding: 0;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+      width: 320px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
       opacity: 0;
-      transform: translateY(16px) scale(0.96);
-      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      transform: translateY(12px) scale(0.97);
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
     .popup-card.visible {
@@ -47,254 +48,144 @@
       transform: translateY(8px) scale(0.97);
     }
 
-    .popup-header {
+    .popup-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 14px 16px 10px;
-      border-bottom: 1px solid #2f2f2f;
     }
 
-    .popup-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #10a37f;
+    .popup-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: #f0f0f0;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex: 0 0 28px;
+      flex-shrink: 0;
+      color: #333;
     }
 
-    .popup-avatar svg { width: 14px; height: 14px; color: #fff; }
+    .popup-icon svg { width: 16px; height: 16px; }
 
     .popup-title {
       font-size: 13px;
       font-weight: 600;
-      color: #ececec;
-    }
-
-    .popup-sub {
-      font-size: 11px;
-      color: #8e8ea0;
+      color: #111;
+      flex: 1;
     }
 
     .popup-close {
-      margin-left: auto;
       width: 22px;
       height: 22px;
-      border-radius: 5px;
-      background: transparent;
+      border-radius: 50%;
+      background: #f0f0f0;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #8e8ea0;
+      color: #888;
       transition: background 0.15s, color 0.15s;
+      flex-shrink: 0;
     }
 
-    .popup-close:hover { background: #2f2f2f; color: #ececec; }
-    .popup-close svg { width: 13px; height: 13px; }
-
-    .popup-body {
-      padding: 14px 16px 16px;
-      min-height: 80px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    /* Typing dots loader */
-    .typing-loader {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      padding: 4px 0;
-    }
-
-    .typing-loader-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #8e8ea0;
-      animation: popupBounce 1.2s ease-in-out infinite;
-    }
-
-    .typing-loader-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-loader-dot:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes popupBounce {
-      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-      40% { transform: translateY(-5px); opacity: 1; }
-    }
+    .popup-close:hover { background: #e0e0e0; color: #333; }
+    .popup-close svg { width: 11px; height: 11px; }
 
     .popup-message {
-      font-size: 13px;
-      line-height: 1.6;
-      color: #d1d5db;
-      display: none;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #555;
+      padding-left: 42px;
     }
-
-    .popup-message a {
-      color: #10a37f;
-      text-decoration: none;
-    }
-
-    .popup-message a:hover { text-decoration: underline; }
 
     .popup-message .highlight {
-      color: #ececec;
+      color: #111;
       font-weight: 600;
     }
 
-    .popup-footer {
-      padding: 8px 16px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .popup-counter {
-      font-size: 10px;
-      color: #555;
-    }
-
     .popup-progress {
-      height: 2px;
-      background: #2f2f2f;
-      border-radius: 1px;
+      height: 3px;
+      background: #eee;
+      border-radius: 2px;
       overflow: hidden;
-      margin: 0 16px 14px;
+      margin-top: 4px;
     }
 
     .popup-progress-bar {
       height: 100%;
-      background: #10a37f;
-      border-radius: 1px;
+      background: #333;
+      border-radius: 2px;
       width: 0%;
-      transition: width 3s linear;
+      transition: width 4s linear;
     }
   </style>
 </head>
 <body>
   <div class="popup-card" id="popup-1">
-    <div class="popup-header">
-      <div class="popup-avatar"><i data-lucide="sparkles"></i></div>
-      <div>
-        <div class="popup-title">Heavenly</div>
-        <div class="popup-sub">1 of 3</div>
-      </div>
+    <div class="popup-row">
+      <div class="popup-icon"><i data-lucide="sparkles"></i></div>
+      <span class="popup-title">Heavenly</span>
       <button class="popup-close" onclick="dismissPopup('popup-1')">
         <i data-lucide="x"></i>
       </button>
     </div>
-    <div class="popup-body" id="popup-1-body">
-      <div class="typing-loader" id="popup-1-loader">
-        <div class="typing-loader-dot"></div>
-        <div class="typing-loader-dot"></div>
-        <div class="typing-loader-dot"></div>
-      </div>
-      <div class="popup-message" id="popup-1-msg">
-        To access Games, AI &amp; Settings, type <span class="highlight">heavenly://games</span>, <span class="highlight">heavenly://ai</span>, or <span class="highlight">heavenly://settings</span> in the address bar.
-      </div>
+    <div class="popup-message" id="popup-1-msg">
+      Access Games, AI &amp; Settings by typing <span class="highlight">heavenly://games</span>, <span class="highlight">heavenly://ai</span>, or <span class="highlight">heavenly://settings</span> in the address bar.
     </div>
     <div class="popup-progress"><div class="popup-progress-bar" id="popup-1-bar"></div></div>
-    <div class="popup-footer">
-      <span class="popup-counter">1/3 popups remaining</span>
-    </div>
   </div>
 
   <div class="popup-card" id="popup-2">
-    <div class="popup-header">
-      <div class="popup-avatar"><i data-lucide="star"></i></div>
-      <div>
-        <div class="popup-title">Heavenly Premium</div>
-        <div class="popup-sub">2 of 3</div>
-      </div>
+    <div class="popup-row">
+      <div class="popup-icon"><i data-lucide="star"></i></div>
+      <span class="popup-title">Heavenly Premium</span>
       <button class="popup-close" onclick="dismissPopup('popup-2')">
         <i data-lucide="x"></i>
       </button>
     </div>
-    <div class="popup-body" id="popup-2-body">
-      <div class="typing-loader" id="popup-2-loader">
-        <div class="typing-loader-dot"></div>
-        <div class="typing-loader-dot"></div>
-        <div class="typing-loader-dot"></div>
-      </div>
-      <div class="popup-message" id="popup-2-msg">
-        Unlock the full Heavenly experience. Visit <span class="highlight">heavenly://premium</span> to purchase our premium plan and get access to all features.
-      </div>
+    <div class="popup-message" id="popup-2-msg">
+      Unlock the full experience. Visit <span class="highlight">heavenly://premium</span> to get access to all features.
     </div>
     <div class="popup-progress"><div class="popup-progress-bar" id="popup-2-bar"></div></div>
-    <div class="popup-footer">
-      <span class="popup-counter">2/3 popups remaining</span>
-    </div>
   </div>
 
   <div class="popup-card" id="popup-3">
-    <div class="popup-header">
-      <div class="popup-avatar"><i data-lucide="heart"></i></div>
-      <div>
-        <div class="popup-title">Support Us</div>
-        <div class="popup-sub">3 of 3</div>
-      </div>
+    <div class="popup-row">
+      <div class="popup-icon"><i data-lucide="heart"></i></div>
+      <span class="popup-title">Support Us</span>
       <button class="popup-close" onclick="dismissPopup('popup-3')">
         <i data-lucide="x"></i>
       </button>
     </div>
-    <div class="popup-body" id="popup-3-body">
-      <div class="typing-loader" id="popup-3-loader">
-        <div class="typing-loader-dot"></div>
-        <div class="typing-loader-dot"></div>
-        <div class="typing-loader-dot"></div>
-      </div>
-      <div class="popup-message" id="popup-3-msg">
-        Love Heavenly? Support the developer on CashApp: <span class="highlight">$OhheyElijah</span> — every bit helps keep this project going! 💚
-      </div>
+    <div class="popup-message" id="popup-3-msg">
+      Love Heavenly? Support the developer on CashApp: <span class="highlight">$OhheyElijah</span> — every bit helps keep this going! 💚
     </div>
     <div class="popup-progress"><div class="popup-progress-bar" id="popup-3-bar"></div></div>
-    <div class="popup-footer">
-      <span class="popup-counter">3/3</span>
-    </div>
   </div>
 
   <script>
     lucide.createIcons();
 
-    // Timing: first popup appears quickly, then one every ~3 seconds
-    const POPUP_LOADING_MS  = 1200; // how long to show typing dots before message
-    const POPUP_1_DELAY_MS  = 400;
-    const POPUP_2_DELAY_MS  = 3600; // ~3s after popup 1 shows its message
-    const POPUP_3_DELAY_MS  = 6800; // ~3s after popup 2 shows its message
+    const POPUP_1_DELAY_MS = 400;
+    const POPUP_2_DELAY_MS = 3200;
+    const POPUP_3_DELAY_MS = 6000;
 
     function dismissPopup(id) {
       const el = document.getElementById(id);
       if (!el) return;
       el.classList.add('hiding');
-      setTimeout(() => { el.style.display = 'none'; }, 350);
+      setTimeout(() => { el.style.display = 'none'; }, 300);
     }
 
     function showPopup(id, delay) {
       setTimeout(() => {
         const card = document.getElementById(id);
-        const loader = document.getElementById(id + '-loader');
-        const msg = document.getElementById(id + '-msg');
         const bar = document.getElementById(id + '-bar');
         if (!card) return;
-
         card.classList.add('visible');
-
-        // After loading delay show message and hide loader
-        setTimeout(() => {
-          if (loader) loader.style.display = 'none';
-          if (msg) msg.style.display = 'block';
-          // Start progress bar
-          if (bar) {
-            requestAnimationFrame(() => { bar.style.width = '100%'; });
-          }
-        }, POPUP_LOADING_MS);
-
+        if (bar) requestAnimationFrame(() => { bar.style.width = '100%'; });
       }, delay);
     }
 
