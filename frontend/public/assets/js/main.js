@@ -28,11 +28,22 @@ class Tab {
   }
 }
 
+const HEAVENLY_PAGES = {
+  'games':    '/games/g.html',
+  'ai':       '/ai/ai.html',
+  'settings': '/settings/settings.html',
+};
+
 function buildEmbedUrl(input) {
   input = input.trim();
   if (!input) return null;
 
   if (input === 'newtab') return 'newtab.html';
+
+  if (/^heavenly:\/\//i.test(input)) {
+    const pageKey = input.replace(/^heavenly:\/\//i, '').toLowerCase().split('/')[0].split('?')[0];
+    return HEAVENLY_PAGES[pageKey] || null;
+  }
 
   let targetUrl = '';
 
@@ -50,6 +61,12 @@ function buildEmbedUrl(input) {
 function getRealUrlFromEmbed(embedSrc) {
   if (!embedSrc) return '';
   if (embedSrc === 'newtab.html' || /\/newtab\.html$/i.test(embedSrc)) return 'New Tab';
+
+  for (const [page, path] of Object.entries(HEAVENLY_PAGES)) {
+    if (embedSrc === path || embedSrc.endsWith(path)) {
+      return 'Heavenly://' + page;
+    }
+  }
 
   try {
     const parsed = new URL(embedSrc, window.location.href);
