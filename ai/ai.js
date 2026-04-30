@@ -9,7 +9,7 @@ const MODELS = [
   { id: 'mistral',   name: 'Mistral Large',    provider: 'Mistral AI',  endpoint: 'pollinations' },
 ];
 
-const STARTER_PROMPTS = [
+const MAX_CONVERSATIONS = 40;
   'What can you help me with?',
   'Write a short poem',
   'Explain quantum computing',
@@ -125,7 +125,7 @@ function loadConversations() {
   conversations = loadJSON('conversations', []);
 }
 function saveConversations() {
-  saveJSON('conversations', conversations.slice(0, 40));
+  saveJSON('conversations', conversations.slice(0, MAX_CONVERSATIONS));
 }
 
 function newConversation() {
@@ -308,7 +308,8 @@ async function fetchAI(messages, modelId) {
     mistral:  'mistral',
   }[modelId] || 'openai';
 
-  const url = `https://text.pollinations.ai/${prompt}?model=${pollinationsModel}&seed=42&json=false`;
+  const seed = Math.floor(Math.random() * 1000000);
+  const url = `https://text.pollinations.ai/${prompt}?model=${pollinationsModel}&seed=${seed}&json=false`;
   const response = await fetch(url, { signal: AbortSignal.timeout(30000) });
   if (!response.ok) throw new Error('API error ' + response.status);
   return (await response.text()).trim();

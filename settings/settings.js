@@ -48,6 +48,7 @@ function buildThemeGrid() {
   THEMES.forEach(theme => {
     const swatch = document.createElement('div');
     swatch.className = 'theme-swatch' + (theme.id === current ? ' selected' : '');
+    swatch.dataset.id = theme.id;
     const v = theme.vars;
     swatch.style.background = v['--bg'] || '#0a0a0a';
     swatch.style.color = v['--text'] || '#e8e8e8';
@@ -130,8 +131,8 @@ const SECTIONS = [
             <div><div class="setting-label">Open page</div></div>
             <select class="select-input" id="startup-page">
               <option value="newtab">New Tab</option>
-              <option value="Heavenly://games">Games</option>
-              <option value="Heavenly://ai">AI</option>
+              <option value="heavenly://games">Games</option>
+              <option value="heavenly://ai">AI</option>
             </select>
           </div>
         </div>
@@ -320,9 +321,9 @@ const SECTIONS = [
     init() {
       document.getElementById('link-github').addEventListener('click', () => navigate('https://github.com/Heavenly-Official/heavenly-official.github.io'));
       document.getElementById('link-newtab').addEventListener('click', () => navigate('newtab'));
-      document.getElementById('link-games').addEventListener('click', () => navigate('Heavenly://games'));
-      document.getElementById('link-ai').addEventListener('click', () => navigate('Heavenly://ai'));
-      document.getElementById('link-premium').addEventListener('click', () => navigate('Heavenly://premium'));
+      document.getElementById('link-games').addEventListener('click', () => navigate('heavenly://games'));
+      document.getElementById('link-ai').addEventListener('click', () => navigate('heavenly://ai'));
+      document.getElementById('link-premium').addEventListener('click', () => navigate('heavenly://premium'));
     }
   }
 ];

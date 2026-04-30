@@ -262,6 +262,12 @@
   <script>
     lucide.createIcons();
 
+    // Timing: first popup appears quickly, then one every ~3 seconds
+    const POPUP_LOADING_MS  = 1200; // how long to show typing dots before message
+    const POPUP_1_DELAY_MS  = 400;
+    const POPUP_2_DELAY_MS  = 3600; // ~3s after popup 1 shows its message
+    const POPUP_3_DELAY_MS  = 6800; // ~3s after popup 2 shows its message
+
     function dismissPopup(id) {
       const el = document.getElementById(id);
       if (!el) return;
@@ -279,7 +285,7 @@
 
         card.classList.add('visible');
 
-        // After 1.2s show message, hide loader
+        // After loading delay show message and hide loader
         setTimeout(() => {
           if (loader) loader.style.display = 'none';
           if (msg) msg.style.display = 'block';
@@ -287,14 +293,14 @@
           if (bar) {
             requestAnimationFrame(() => { bar.style.width = '100%'; });
           }
-        }, 1200);
+        }, POPUP_LOADING_MS);
 
       }, delay);
     }
 
-    showPopup('popup-1', 400);
-    showPopup('popup-2', 3600);
-    showPopup('popup-3', 6800);
+    showPopup('popup-1', POPUP_1_DELAY_MS);
+    showPopup('popup-2', POPUP_2_DELAY_MS);
+    showPopup('popup-3', POPUP_3_DELAY_MS);
   </script>
 </body>
 </html>

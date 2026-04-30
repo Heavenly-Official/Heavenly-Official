@@ -427,7 +427,7 @@ function showStartupPopup() {
       title: 'Heavenly',
       sub: '1 of 3',
       counter: '1/3 popups remaining',
-      text: 'To get to Games, AI & Settings, type <b>heavenly://games</b>, <b>heavenly://ai</b>, or <b>heavenly://settings</b> in the address bar.',
+      text: 'To get to Games, AI &amp; Settings, type <b>heavenly://games</b>, <b>heavenly://ai</b>, or <b>heavenly://settings</b> in the address bar.',
     },
     {
       icon: 'star',
@@ -539,7 +539,9 @@ window.addEventListener('message', (e) => {
     const tab = getActiveTab();
     if (!tab) return;
     const url = e.data.url;
-    if (!url) return;
+    if (!url || typeof url !== 'string') return;
+    // Validate: only allow safe URL schemes and Heavenly internal pages
+    if (/^javascript:/i.test(url.trim())) return;
     navigate(url, tab);
     return;
   }
