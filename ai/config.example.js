@@ -1,6 +1,5 @@
-// Copy this file to config.js and fill in your API key.
-// config.js is gitignored — never commit it.
-// For production, the deploy workflow injects the key from GitHub Secrets automatically.
-window.AI_CONFIG = {
-  openai_api_key: 'YOUR_OPENAI_API_KEY_HERE'
-};
+// The OpenAI API key is no longer stored in the frontend.
+// It is kept as a Cloudflare Worker secret (OPENAI_API_KEY).
+//
+// To deploy the worker and set the secret, see cloudflare-worker/README.md.
+// After deploying, update the WORKER_URL constant in ai/ai.js with your worker URL.

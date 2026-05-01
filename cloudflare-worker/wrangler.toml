@@ -1,0 +1,16 @@
+name = "heavenly-ai-proxy"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Optional: lock to a specific account
+# account_id = "YOUR_CLOUDFLARE_ACCOUNT_ID"
+
+[vars]
+# Set ALLOWED_ORIGIN to your site so only your domain can call the worker.
+# Example:  ALLOWED_ORIGIN = "https://heavenly-official.github.io"
+# Leave it out (or set to "*") to allow any origin during development.
+ALLOWED_ORIGIN = "https://heavenly-official.github.io"
+
+# OPENAI_API_KEY is a SECRET — never put it here.
+# Run:  wrangler secret put OPENAI_API_KEY
+# …and paste your key when prompted.
