@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI — Heavenly</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="ai.css" />
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <i data-lucide="sparkles"></i>
+        Heavenly AI
+      </div>
+      <button class="icon-btn" id="settings-btn" title="AI Settings">
+        <i data-lucide="settings-2"></i>
+      </button>
+    </div>
+
+    <button class="new-chat-btn" id="new-chat-btn">
+      <i data-lucide="plus"></i>
+      New chat
+    </button>
+
+    <div class="sidebar-section-label">Recent</div>
+    <div class="history-list" id="history-list"></div>
+
+    <div class="sidebar-footer">
+      <select class="model-selector" id="model-selector"></select>
+    </div>
+  </aside>
+
+  <!-- Main chat -->
+  <div class="chat-main">
+    <div class="chat-header">
+      <div>
+        <div class="chat-model-name" id="chat-model-name">Heavenly AI · Built-in</div>
+        <div class="chat-model-sub">Powered by Heavenly</div>
+      </div>
+      <div class="chat-actions">
+        <button class="icon-btn" id="settings-btn-header" title="Settings">
+          <i data-lucide="sliders-horizontal"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Welcome screen -->
+    <div class="welcome" id="welcome-screen">
+      <div class="welcome-icon"><i data-lucide="sparkles"></i></div>
+      <h2>How can I help you?</h2>
+      <p>Ask me anything — I'm Heavenly AI, your built-in assistant.</p>
+      <div class="welcome-prompts" id="welcome-prompts"></div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-area" id="messages-area" style="display:none">
+      <div class="messages-inner" id="messages-inner"></div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-area">
+      <div class="screenshare-preview" id="screenshare-preview">
+        <video id="screenshare-video" autoplay muted playsinline></video>
+        <div class="screenshare-preview-bar">
+          <span>● Sharing screen</span>
+          <button class="screenshare-stop-btn" id="screenshare-stop-btn">Stop</button>
+        </div>
+      </div>
+      <div class="input-toolbar">
+        <button class="toolbar-btn" id="screenshare-btn" title="Share screen">
+          <i data-lucide="monitor"></i>
+          Share screen
+        </button>
+      </div>
+      <div class="input-box">
+        <textarea
+          class="chat-textarea"
+          id="chat-textarea"
+          placeholder="Message Heavenly AI…"
+          rows="1"
+          spellcheck="false"
+        ></textarea>
+        <button class="send-btn" id="send-btn" title="Send" disabled>
+          <i data-lucide="arrow-up"></i>
+        </button>
+      </div>
+      <div class="input-footer">Heavenly AI · heavenly://ai</div>
+    </div>
+  </div>
+
+  <!-- Settings panel -->
+  <aside class="settings-panel" id="settings-panel">
+    <div class="settings-panel-header">
+      <span class="settings-panel-title">AI Settings</span>
+      <button class="icon-btn" id="close-settings">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-section-label">Model</div>
+      <div class="model-cards" id="model-cards"></div>
+
+      <div class="settings-section-label">Preferences</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Stream responses</div>
+          <div class="setting-sub">Show replies word-by-word</div>
+        </div>
+        <button class="toggle on" id="toggle-stream" aria-pressed="true"></button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Safe mode</div>
+          <div class="setting-sub">Filter sensitive content</div>
+        </div>
+        <button class="toggle on" id="toggle-safe" aria-pressed="true"></button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Response language</div>
+        </div>
+        <select class="select-input" id="lang-select">
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="ja">Japanese</option>
+          <option value="zh">Chinese</option>
+          <option value="pt">Portuguese</option>
+          <option value="ko">Korean</option>
+        </select>
+      </div>
+    </div>
+  </aside>
+
+  <script src="config.js"></script>
+  <script src="ai.js"></script>
+  <script>
+    // Enable send button when textarea has text
+    const ta = document.getElementById('chat-textarea');
+    const sb = document.getElementById('send-btn');
+    ta.addEventListener('input', () => { sb.disabled = !ta.value.trim(); });
+
+    // Header settings button mirrors sidebar one
+    document.getElementById('settings-btn-header').addEventListener('click', () => {
+      document.getElementById('settings-panel').classList.toggle('open');
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heavenly</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 20px;
+    }
+
+    .popup-card {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 280px;
+      background: #18191e;
+      border: 1px solid #2a2b32;
+      border-radius: 10px;
+      padding: 12px 14px 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .popup-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .popup-card.hiding {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+    }
+
+    .popup-accent {
+      width: 36px;
+      height: 3px;
+      background: #4ade80;
+      border-radius: 2px;
+      margin-bottom: 10px;
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 18px;
+      height: 18px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #6b7280;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+      padding: 0;
+    }
+
+    .popup-close:hover { color: #d1d5db; }
+
+    .popup-message {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #d1d5db;
+      padding-right: 16px;
+    }
+
+    .popup-message .highlight {
+      color: #ffffff;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="popup-card" id="popup-card">
+    <div class="popup-accent"></div>
+    <button class="popup-close" id="popup-close-btn">&#x2715;</button>
+    <div class="popup-message" id="popup-message"></div>
+  </div>
+
+  <script>
+    const popups = [
+      {
+        message: 'Tired of ads? Purchase <span class="highlight">Premium</span> in our Discord to remove them.'
+      },
+      {
+        message: 'Access Games, AI &amp; Settings by typing <span class="highlight">heavenly://games</span>, <span class="highlight">heavenly://ai</span>, or <span class="highlight">heavenly://settings</span>.'
+      },
+      {
+        message: 'Love Heavenly? Support the developer on CashApp: <span class="highlight">$OhheyElijah</span> — every bit helps! 💚'
+      }
+    ];
+
+    const DISPLAY_DURATION = 4000;
+    const TRANSITION_MS = 300;
+    const BETWEEN_DELAY = 600;
+
+    const card = document.getElementById('popup-card');
+    const msgEl = document.getElementById('popup-message');
+    const closeBtn = document.getElementById('popup-close-btn');
+
+    let currentIndex = 0;
+    let autoTimer = null;
+
+    function showNext() {
+      if (currentIndex >= popups.length) return;
+      msgEl.innerHTML = popups[currentIndex].message;
+      card.classList.remove('hiding');
+      card.classList.add('visible');
+      autoTimer = setTimeout(() => hideAndNext(), DISPLAY_DURATION);
+    }
+
+    function hideAndNext() {
+      clearTimeout(autoTimer);
+      card.classList.remove('visible');
+      card.classList.add('hiding');
+      currentIndex++;
+      if (currentIndex < popups.length) {
+        setTimeout(() => {
+          card.classList.remove('hiding');
+          showNext();
+        }, TRANSITION_MS + BETWEEN_DELAY);
+      }
+    }
+
+    closeBtn.addEventListener('click', () => hideAndNext());
+
+    setTimeout(() => showNext(), 500);
+  </script>
+</body>
+</html>
