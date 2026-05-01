@@ -1,6 +1,5 @@
-// Copy this file to config.js and fill in your API key.
-// config.js is gitignored — never commit it.
-// For production, the deploy workflow injects the key from GitHub Secrets automatically.
-window.AI_CONFIG = {
-  openai_api_key: 'YOUR_OPENAI_API_KEY_HERE'
-};
+// The OpenAI API key is no longer stored in the frontend.
+// It is kept as a Vercel environment variable (OPENAI_API_KEY).
+//
+// To deploy the serverless function and set the secret, see api/README.md.
+// After deploying, update the WORKER_URL constant in ai/ai.js with your Vercel project URL.

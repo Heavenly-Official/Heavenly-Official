@@ -403,12 +403,11 @@ async function sendMessage(text) {
   chatTextarea.focus();
 }
 
-async function fetchAI(messages, modelId) {
-  const apiKey = (window.AI_CONFIG && window.AI_CONFIG.openai_api_key) || '';
-  if (!apiKey || apiKey === 'YOUR_OPENAI_API_KEY_HERE') {
-    throw new Error('OpenAI API key not configured');
-  }
+// URL of the Vercel serverless function proxy — update this after you deploy.
+// See api/README.md for deployment instructions.
+const WORKER_URL = 'https://your-project-name.vercel.app/api';
 
+async function fetchAI(messages, modelId) {
   const systemPrompt = 'You are Heavenly AI, a helpful built-in assistant.';
 
   const apiMessages = [
@@ -427,12 +426,9 @@ async function fetchAI(messages, modelId) {
     })
   ];
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch(WORKER_URL + '/chat', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + apiKey
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ model: 'gpt-4o-mini', messages: apiMessages }),
     signal: AbortSignal.timeout(40000)
   });
