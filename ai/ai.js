@@ -319,6 +319,7 @@ function scrollToBottom() {
 }
 
 // ── Daily request tracking ────────────────────────────
+// Returns the current date as YYYY-MM-DD, used as a localStorage key.
 function todayKey() { return new Date().toISOString().slice(0, 10); }
 
 function getDailyCount() {
@@ -330,6 +331,16 @@ function getDailyCount() {
 function incrementDailyCount() {
   const count = getDailyCount() + 1;
   saveJSON('daily', { date: todayKey(), count });
+}
+
+// Appends an AI message to the conversation and DOM, then resets streaming state.
+function replyWithMessage(conv, msg) {
+  conv.messages.push({ role: 'ai', content: msg });
+  saveConversations();
+  appendMessageDOM('ai', msg, null, true);
+  isStreaming = false;
+  sendBtn.disabled = false;
+  chatTextarea.focus();
 }
 
 // ── Send message ──────────────────────────────────────
@@ -362,26 +373,13 @@ async function sendMessage(text) {
 
   // Coming-soon models
   if (selectedModel.comingSoon) {
-    removeTypingIndicator();
-    const comingSoonMsg = 'This model is coming soon. If you want more requests, buy premium (not out yet).';
-    conv.messages.push({ role: 'ai', content: comingSoonMsg });
-    saveConversations();
-    appendMessageDOM('ai', comingSoonMsg, null, true);
-    isStreaming = false;
-    sendBtn.disabled = false;
-    chatTextarea.focus();
+    replyWithMessage(conv, 'This model is coming soon. If you want more requests, buy premium (not out yet).');
     return;
   }
 
   // Daily request limit
   if (getDailyCount() >= DAILY_LIMIT) {
-    const limitMsg = `You've reached the daily limit of ${DAILY_LIMIT} requests. Come back tomorrow!`;
-    conv.messages.push({ role: 'ai', content: limitMsg });
-    saveConversations();
-    appendMessageDOM('ai', limitMsg, null, true);
-    isStreaming = false;
-    sendBtn.disabled = false;
-    chatTextarea.focus();
+    replyWithMessage(conv, `You've reached the daily limit of ${DAILY_LIMIT} requests. Come back tomorrow!`);
     return;
   }
 
