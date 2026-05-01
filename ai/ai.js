@@ -1,13 +1,15 @@
 'use strict';
 
 const MODELS = [
-  { id: 'heavenly',  name: 'Heavenly AI',     provider: 'Built-in',    pollinationsId: 'openai' },
-  { id: 'gpt4o',     name: 'GPT-4o',          provider: 'OpenAI',      pollinationsId: 'openai' },
-  { id: 'gemini',    name: 'Gemini Pro',       provider: 'Google',      pollinationsId: 'openai' },
-  { id: 'claude',    name: 'Claude 3.5',       provider: 'Anthropic',   pollinationsId: 'openai-large' },
-  { id: 'llama',     name: 'Llama 3',          provider: 'Meta',        pollinationsId: 'llama' },
-  { id: 'mistral',   name: 'Mistral Large',    provider: 'Mistral AI',  pollinationsId: 'mistral' },
+  { id: 'heavenly',  name: 'Heavenly AI',     provider: 'Built-in',    comingSoon: false },
+  { id: 'gpt4o',     name: 'GPT-4o',          provider: 'OpenAI',      comingSoon: true  },
+  { id: 'gemini',    name: 'Gemini Pro',       provider: 'Google',      comingSoon: true  },
+  { id: 'claude',    name: 'Claude 3.5',       provider: 'Anthropic',   comingSoon: true  },
+  { id: 'llama',     name: 'Llama 3',          provider: 'Meta',        comingSoon: true  },
+  { id: 'mistral',   name: 'Mistral Large',    provider: 'Mistral AI',  comingSoon: true  },
 ];
+
+const DAILY_LIMIT = 5;
 
 const STARTER_PROMPTS = [
   'What can you help me with?',
@@ -125,12 +127,12 @@ function buildModelCards() {
   const selected = load('model', 'heavenly');
   MODELS.forEach(m => {
     const card = document.createElement('div');
-    card.className = 'model-card' + (m.id === selected ? ' selected' : '');
+    card.className = 'model-card' + (m.id === selected ? ' selected' : '') + (m.comingSoon ? ' coming-soon' : '');
     card.dataset.id = m.id;
     card.innerHTML = `
       <div class="model-radio"><div class="model-radio-dot"></div></div>
       <div>
-        <div class="model-name">${m.name}</div>
+        <div class="model-name">${m.name}${m.comingSoon ? ' <span class="model-badge">Coming soon</span>' : ''}</div>
         <div class="model-provider">${m.provider}</div>
       </div>
     `;
@@ -316,6 +318,31 @@ function scrollToBottom() {
   if (area) area.scrollTop = area.scrollHeight;
 }
 
+// ── Daily request tracking ────────────────────────────
+// Returns the current date as YYYY-MM-DD, used as a localStorage key.
+function todayKey() { return new Date().toISOString().slice(0, 10); }
+
+function getDailyCount() {
+  const stored = loadJSON('daily', { date: '', count: 0 });
+  if (stored.date !== todayKey()) return 0;
+  return stored.count;
+}
+
+function incrementDailyCount() {
+  const count = getDailyCount() + 1;
+  saveJSON('daily', { date: todayKey(), count });
+}
+
+// Appends an AI message to the conversation and DOM, then resets streaming state.
+function replyWithMessage(conv, msg) {
+  conv.messages.push({ role: 'ai', content: msg });
+  saveConversations();
+  appendMessageDOM('ai', msg, null, true);
+  isStreaming = false;
+  sendBtn.disabled = false;
+  chatTextarea.focus();
+}
+
 // ── Send message ──────────────────────────────────────
 async function sendMessage(text) {
   text = text.trim();
@@ -341,10 +368,26 @@ async function sendMessage(text) {
   sendBtn.disabled = true;
   isStreaming = true;
 
+  const selectedModelId = load('model', 'heavenly');
+  const selectedModel = MODELS.find(x => x.id === selectedModelId) || MODELS[0];
+
+  // Coming-soon models
+  if (selectedModel.comingSoon) {
+    replyWithMessage(conv, 'This model is coming soon. If you want more requests, buy premium (not out yet).');
+    return;
+  }
+
+  // Daily request limit
+  if (getDailyCount() >= DAILY_LIMIT) {
+    replyWithMessage(conv, `You've reached the daily limit of ${DAILY_LIMIT} requests. Come back tomorrow!`);
+    return;
+  }
+
   showTypingIndicator();
 
   try {
-    const reply = await fetchAI(conv.messages, load('model', 'heavenly'));
+    const reply = await fetchAI(conv.messages, selectedModelId);
+    incrementDailyCount();
     removeTypingIndicator();
     conv.messages.push({ role: 'ai', content: reply });
     saveConversations();
@@ -361,16 +404,16 @@ async function sendMessage(text) {
 }
 
 async function fetchAI(messages, modelId) {
-  const m = MODELS.find(x => x.id === modelId) || MODELS[0];
-  const pollinationsModel = m.pollinationsId;
+  const apiKey = (window.AI_CONFIG && window.AI_CONFIG.openai_api_key) || '';
+  if (!apiKey || apiKey === 'YOUR_OPENAI_API_KEY_HERE') {
+    throw new Error('OpenAI API key not configured');
+  }
 
-  // Check if the latest user message has a screenshot
-  const lastMsg = messages[messages.length - 1];
-  const hasImage = lastMsg && lastMsg.role === 'user' && lastMsg.screenshot;
+  const systemPrompt = 'You are Heavenly AI, a helpful built-in assistant.';
 
-  if (hasImage) {
-    // Use the Pollinations chat completions API (supports vision)
-    const apiMessages = messages.slice(-6).map(msg => {
+  const apiMessages = [
+    { role: 'system', content: systemPrompt },
+    ...messages.slice(-8).map(msg => {
       if (msg.role === 'user' && msg.screenshot) {
         return {
           role: 'user',
@@ -381,29 +424,26 @@ async function fetchAI(messages, modelId) {
         };
       }
       return { role: msg.role === 'user' ? 'user' : 'assistant', content: msg.content };
-    });
+    })
+  ];
 
-    const response = await fetch('https://api.pollinations.ai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'openai', messages: apiMessages }),
-      signal: AbortSignal.timeout(40000)
-    });
-    if (!response.ok) throw new Error('API error ' + response.status);
-    const data = await response.json();
-    return data.choices[0].message.content.trim();
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + apiKey
+    },
+    body: JSON.stringify({ model: 'gpt-4o-mini', messages: apiMessages }),
+    signal: AbortSignal.timeout(40000)
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error((err.error && err.error.message) || 'API error ' + response.status);
   }
 
-  // Text-only: use simple text endpoint
-  const history = messages.slice(-6).map(msg =>
-    (msg.role === 'user' ? 'User: ' : 'Assistant: ') + msg.content
-  ).join('\n');
-
-  const seed = Math.floor(Math.random() * 1000000);
-  const url = `https://text.pollinations.ai/${encodeURIComponent(history)}?model=${pollinationsModel}&seed=${seed}&json=false`;
-  const response = await fetch(url, { signal: AbortSignal.timeout(30000) });
-  if (!response.ok) throw new Error('API error ' + response.status);
-  return (await response.text()).trim();
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
 }
 
 // ── Input handling ────────────────────────────────────
