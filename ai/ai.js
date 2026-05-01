@@ -1,24 +1,30 @@
 'use strict';
 
 const MODELS = [
-  { id: 'heavenly',  name: 'Heavenly AI',     provider: 'Built-in',    endpoint: 'pollinations' },
-  { id: 'gpt4o',     name: 'GPT-4o',          provider: 'OpenAI',      endpoint: 'pollinations' },
-  { id: 'gemini',    name: 'Gemini Pro',       provider: 'Google',      endpoint: 'pollinations' },
-  { id: 'claude',    name: 'Claude 3.5',       provider: 'Anthropic',   endpoint: 'pollinations' },
-  { id: 'llama',     name: 'Llama 3',          provider: 'Meta',        endpoint: 'pollinations' },
-  { id: 'mistral',   name: 'Mistral Large',    provider: 'Mistral AI',  endpoint: 'pollinations' },
+  { id: 'heavenly',  name: 'Heavenly AI',     provider: 'Built-in',    pollinationsId: 'openai' },
+  { id: 'gpt4o',     name: 'GPT-4o',          provider: 'OpenAI',      pollinationsId: 'openai' },
+  { id: 'gemini',    name: 'Gemini Pro',       provider: 'Google',      pollinationsId: 'openai' },
+  { id: 'claude',    name: 'Claude 3.5',       provider: 'Anthropic',   pollinationsId: 'openai-large' },
+  { id: 'llama',     name: 'Llama 3',          provider: 'Meta',        pollinationsId: 'llama' },
+  { id: 'mistral',   name: 'Mistral Large',    provider: 'Mistral AI',  pollinationsId: 'mistral' },
 ];
 
-const MAX_CONVERSATIONS = 40;
+const STARTER_PROMPTS = [
   'What can you help me with?',
   'Write a short poem',
   'Explain quantum computing',
   'Help me brainstorm ideas',
 ];
 
+const MAX_CONVERSATIONS = 40;
+
 let conversations = [];
 let activeConvId   = null;
 let isStreaming     = false;
+
+// Screenshare state
+let screenStream    = null;
+let pendingScreenshot = null; // base64 data URL captured on send
 
 function load(key, def) {
   try { return localStorage.getItem('heavenly_ai_' + key) ?? def; } catch(e) { return def; }
@@ -43,6 +49,12 @@ const sendBtn       = document.getElementById('send-btn');
 const settingsPanel = document.getElementById('settings-panel');
 const chatModelName = document.getElementById('chat-model-name');
 
+// Screenshare elements
+const screenshareBtn     = document.getElementById('screenshare-btn');
+const screensharePreview = document.getElementById('screenshare-preview');
+const screenshareVideo   = document.getElementById('screenshare-video');
+const screenshareStopBtn = document.getElementById('screenshare-stop-btn');
+
 // ── Model selector ────────────────────────────────────
 MODELS.forEach(m => {
   const opt = document.createElement('option');
@@ -61,6 +73,49 @@ function updateModelHeader() {
   if (chatModelName) chatModelName.textContent = m.name + ' · ' + m.provider;
 }
 updateModelHeader();
+
+// ── Screenshare ───────────────────────────────────────
+function startScreenshare() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+    alert('Screen sharing is not supported in this browser.');
+    return;
+  }
+  navigator.mediaDevices.getDisplayMedia({ video: true, audio: false })
+    .then(stream => {
+      screenStream = stream;
+      screenshareVideo.srcObject = stream;
+      screensharePreview.classList.add('visible');
+      screenshareBtn.classList.add('active');
+      stream.getVideoTracks()[0].addEventListener('ended', stopScreenshare);
+    })
+    .catch(() => {});
+}
+
+function stopScreenshare() {
+  if (screenStream) {
+    screenStream.getTracks().forEach(t => t.stop());
+    screenStream = null;
+  }
+  screenshareVideo.srcObject = null;
+  screensharePreview.classList.remove('visible');
+  screenshareBtn.classList.remove('active');
+  pendingScreenshot = null;
+}
+
+function captureScreenFrame() {
+  if (!screenStream) return null;
+  const video = screenshareVideo;
+  const canvas = document.createElement('canvas');
+  canvas.width  = video.videoWidth  || 1280;
+  canvas.height = video.videoHeight || 720;
+  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL('image/jpeg', 0.8);
+}
+
+screenshareBtn.addEventListener('click', () => {
+  if (screenStream) { stopScreenshare(); } else { startScreenshare(); }
+});
+screenshareStopBtn.addEventListener('click', stopScreenshare);
 
 // ── Settings panel ────────────────────────────────────
 function buildModelCards() {
@@ -164,7 +219,7 @@ function loadConversation(id) {
   if (conv.messages.length === 0) {
     showWelcome();
   } else {
-    conv.messages.forEach(m => appendMessageDOM(m.role, m.content, false));
+    conv.messages.forEach(m => appendMessageDOM(m.role, m.content, m.screenshot || null, false));
     scrollToBottom();
   }
 }
@@ -176,7 +231,7 @@ function showWelcome() {
 }
 
 // ── Render messages ───────────────────────────────────
-function appendMessageDOM(role, content, scroll = true) {
+function appendMessageDOM(role, content, screenshot, scroll) {
   welcomeScreen.style.display = 'none';
   messagesInner.parentElement.style.display = '';
 
@@ -194,6 +249,16 @@ function appendMessageDOM(role, content, scroll = true) {
   const contentEl = document.createElement('div');
   contentEl.className = 'msg-content';
   contentEl.innerHTML = formatContent(content);
+
+  if (screenshot) {
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'msg-screenshot';
+    const img = document.createElement('img');
+    img.src = screenshot;
+    img.alt = 'Screenshot';
+    imgWrap.appendChild(img);
+    contentEl.appendChild(imgWrap);
+  }
 
   div.appendChild(avatar);
   div.appendChild(contentEl);
@@ -264,27 +329,30 @@ async function sendMessage(text) {
     renderHistory();
   }
 
-  conv.messages.push({ role: 'user', content: text });
+  // Capture screenshot if screensharing
+  const screenshot = screenStream ? captureScreenFrame() : null;
+
+  conv.messages.push({ role: 'user', content: text, screenshot: screenshot || undefined });
   saveConversations();
-  appendMessageDOM('user', text);
+  appendMessageDOM('user', text, screenshot, true);
 
   chatTextarea.value = '';
   autoResize();
   sendBtn.disabled = true;
   isStreaming = true;
 
-  const typingEl = showTypingIndicator();
+  showTypingIndicator();
 
   try {
     const reply = await fetchAI(conv.messages, load('model', 'heavenly'));
     removeTypingIndicator();
     conv.messages.push({ role: 'ai', content: reply });
     saveConversations();
-    appendMessageDOM('ai', reply);
+    appendMessageDOM('ai', reply, null, true);
   } catch(err) {
     removeTypingIndicator();
     const errMsg = 'Sorry, I couldn\'t reach the AI right now. Please try again.';
-    appendMessageDOM('ai', errMsg);
+    appendMessageDOM('ai', errMsg, null, true);
   }
 
   isStreaming = false;
@@ -293,23 +361,46 @@ async function sendMessage(text) {
 }
 
 async function fetchAI(messages, modelId) {
-  const lastMsg = messages[messages.length - 1].content;
-  const history = messages.slice(-6).map(m =>
-    (m.role === 'user' ? 'User: ' : 'Assistant: ') + m.content
+  const m = MODELS.find(x => x.id === modelId) || MODELS[0];
+  const pollinationsModel = m.pollinationsId;
+
+  // Check if the latest user message has a screenshot
+  const lastMsg = messages[messages.length - 1];
+  const hasImage = lastMsg && lastMsg.role === 'user' && lastMsg.screenshot;
+
+  if (hasImage) {
+    // Use the Pollinations chat completions API (supports vision)
+    const apiMessages = messages.slice(-6).map(msg => {
+      if (msg.role === 'user' && msg.screenshot) {
+        return {
+          role: 'user',
+          content: [
+            { type: 'text', text: msg.content },
+            { type: 'image_url', image_url: { url: msg.screenshot } }
+          ]
+        };
+      }
+      return { role: msg.role === 'user' ? 'user' : 'assistant', content: msg.content };
+    });
+
+    const response = await fetch('https://api.pollinations.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'openai', messages: apiMessages }),
+      signal: AbortSignal.timeout(40000)
+    });
+    if (!response.ok) throw new Error('API error ' + response.status);
+    const data = await response.json();
+    return data.choices[0].message.content.trim();
+  }
+
+  // Text-only: use simple text endpoint
+  const history = messages.slice(-6).map(msg =>
+    (msg.role === 'user' ? 'User: ' : 'Assistant: ') + msg.content
   ).join('\n');
 
-  const prompt = encodeURIComponent(history);
-  const pollinationsModel = {
-    heavenly: 'openai',
-    gpt4o:    'openai',
-    gemini:   'openai',
-    claude:   'openai-large',
-    llama:    'llama',
-    mistral:  'mistral',
-  }[modelId] || 'openai';
-
   const seed = Math.floor(Math.random() * 1000000);
-  const url = `https://text.pollinations.ai/${prompt}?model=${pollinationsModel}&seed=${seed}&json=false`;
+  const url = `https://text.pollinations.ai/${encodeURIComponent(history)}?model=${pollinationsModel}&seed=${seed}&json=false`;
   const response = await fetch(url, { signal: AbortSignal.timeout(30000) });
   if (!response.ok) throw new Error('API error ' + response.status);
   return (await response.text()).trim();

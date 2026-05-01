@@ -1,19 +1,20 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #212121;
-  --sidebar-bg: #171717;
-  --text: #ececec;
-  --subtext: #8e8ea0;
-  --border: #2f2f2f;
-  --card-bg: #2a2a2a;
-  --card-hover: #323232;
-  --input-bg: #2f2f2f;
-  --accent: #10a37f;
-  --accent-hover: #0e8f6e;
-  --user-bubble: #2f2f2f;
+  --bg: #0e0f12;
+  --sidebar-bg: #0a0b0e;
+  --text: #e8eaed;
+  --subtext: #6b7280;
+  --border: #1f2028;
+  --card-bg: #14151a;
+  --card-hover: #1a1b22;
+  --input-bg: #14151a;
+  --accent: #4ade80;
+  --accent-hover: #22c55e;
+  --user-bubble: #1a1b22;
   --ai-bubble: transparent;
-  --send-btn: #10a37f;
+  --send-btn: #4ade80;
+  --send-btn-text: #0a0b0e;
 }
 
 html, body {
@@ -29,8 +30,8 @@ body { display: flex; height: 100%; }
 
 /* ── Sidebar ───────────────────────────────────────── */
 .sidebar {
-  width: 260px;
-  flex: 0 0 260px;
+  width: 240px;
+  flex: 0 0 240px;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--border);
   display: flex;
@@ -388,23 +389,23 @@ body { display: flex; height: 100%; }
 .chat-textarea::placeholder { color: var(--subtext); }
 
 .send-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
   background: var(--send-btn);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--send-btn-text);
   transition: background 0.15s, opacity 0.15s;
-  flex: 0 0 34px;
+  flex: 0 0 32px;
 }
 
-.send-btn:hover { background: var(--accent-hover); }
-.send-btn:disabled { opacity: 0.4; cursor: default; background: var(--send-btn); }
-.send-btn svg { width: 16px; height: 16px; }
+.send-btn:hover:not(:disabled) { background: var(--accent-hover); }
+.send-btn:disabled { opacity: 0.35; cursor: default; }
+.send-btn svg { width: 15px; height: 15px; }
 
 .input-footer {
   text-align: center;
@@ -521,7 +522,7 @@ body { display: flex; height: 100%; }
   cursor: pointer;
 }
 
-.select-input option { background: #1a1a1a; }
+.select-input option { background: #0a0b0e; }
 
 /* ── Model Cards ───────────────────────────────────── */
 .model-cards {
@@ -544,7 +545,7 @@ body { display: flex; height: 100%; }
 
 .model-card:hover { background: var(--card-hover); }
 
-.model-card.selected { border-color: var(--accent); background: rgba(16,163,127,0.08); }
+.model-card.selected { border-color: var(--accent); background: rgba(74,222,128,0.07); }
 
 .model-radio {
   width: 14px;
@@ -572,3 +573,109 @@ body { display: flex; height: 100%; }
 
 .model-name { font-size: 12px; font-weight: 500; color: var(--text); }
 .model-provider { font-size: 11px; color: var(--subtext); }
+
+/* ── Input toolbar ─────────────────────────────────── */
+.input-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 2px 8px;
+  max-width: 740px;
+  margin: 0 auto;
+}
+
+.toolbar-btn {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--subtext);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.toolbar-btn:hover { background: var(--card-bg); color: var(--text); border-color: rgba(255,255,255,0.08); }
+.toolbar-btn svg { width: 13px; height: 13px; }
+
+.toolbar-btn.active {
+  background: rgba(74,222,128,0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Screenshare preview ───────────────────────────── */
+.screenshare-preview {
+  max-width: 740px;
+  margin: 0 auto 8px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  position: relative;
+  display: none;
+  background: #000;
+}
+
+.screenshare-preview.visible { display: block; }
+
+.screenshare-preview video {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  display: block;
+}
+
+.screenshare-preview-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 6px 10px;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--accent);
+  backdrop-filter: blur(4px);
+}
+
+.screenshare-stop-btn {
+  background: rgba(239,68,68,0.2);
+  border: 1px solid rgba(239,68,68,0.4);
+  border-radius: 5px;
+  color: #f87171;
+  font-size: 11px;
+  font-family: inherit;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.screenshare-stop-btn:hover { background: rgba(239,68,68,0.35); }
+
+/* ── Screenshot in message ─────────────────────────── */
+.msg-screenshot {
+  margin-top: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  max-width: 400px;
+}
+
+.msg-screenshot img {
+  width: 100%;
+  display: block;
+}
+
+/* ── Accent bar on sidebar logo ────────────────────── */
+.sidebar-logo-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: 0 0 7px;
+}

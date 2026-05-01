@@ -63,6 +63,19 @@
 
     <!-- Input -->
     <div class="input-area">
+      <div class="screenshare-preview" id="screenshare-preview">
+        <video id="screenshare-video" autoplay muted playsinline></video>
+        <div class="screenshare-preview-bar">
+          <span>● Sharing screen</span>
+          <button class="screenshare-stop-btn" id="screenshare-stop-btn">Stop</button>
+        </div>
+      </div>
+      <div class="input-toolbar">
+        <button class="toolbar-btn" id="screenshare-btn" title="Share screen">
+          <i data-lucide="monitor"></i>
+          Share screen
+        </button>
+      </div>
       <div class="input-box">
         <textarea
           class="chat-textarea"
