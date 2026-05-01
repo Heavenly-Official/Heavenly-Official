@@ -403,9 +403,9 @@ async function sendMessage(text) {
   chatTextarea.focus();
 }
 
-// URL of the Cloudflare Worker proxy — update this after you deploy the worker.
-// See cloudflare-worker/README.md for deployment instructions.
-const WORKER_URL = 'https://heavenly-ai-proxy.heavenly-official.workers.dev';
+// URL of the Vercel serverless function proxy — update this after you deploy.
+// See api/README.md for deployment instructions.
+const WORKER_URL = 'https://your-project-name.vercel.app/api';
 
 async function fetchAI(messages, modelId) {
   const systemPrompt = 'You are Heavenly AI, a helpful built-in assistant.';
