@@ -422,3 +422,136 @@ html, body {
   background: rgba(255,255,255,0.15);
   color: var(--text);
 }
+
+/* ── Control Panel (Ctrl+Y) ─────────────────────────────── */
+#ctrl-panel-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+}
+
+#ctrl-panel-overlay.open {
+  display: flex;
+}
+
+#ctrl-panel {
+  background: #141414;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 340px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  animation: ctrlPanelIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes ctrlPanelIn {
+  from { opacity: 0; transform: scale(0.95) translateY(-6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.ctrl-panel-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ctrl-panel-header svg {
+  width: 14px;
+  height: 14px;
+  color: var(--subtext);
+  flex: 0 0 14px;
+}
+
+.ctrl-panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--subtext);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ctrl-panel-shortcut {
+  margin-left: auto;
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 0.04em;
+}
+
+.ctrl-panel-list {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ctrl-panel-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  transition: background 0.12s;
+}
+
+.ctrl-panel-item:hover {
+  background: var(--hover);
+}
+
+.ctrl-panel-item-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  color: var(--subtext);
+}
+
+.ctrl-panel-item-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ctrl-panel-item-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.ctrl-panel-item-url {
+  font-size: 11px;
+  color: var(--subtext);
+  margin-top: 1px;
+}
+
+/* ── Ctrl+Y hint note ───────────────────────────────────── */
+#ctrl-panel-hint {
+  position: fixed;
+  bottom: 10px;
+  left: 12px;
+  z-index: 9000;
+  font-size: 10px;
+  color: #3a3a3a;
+  letter-spacing: 0.06em;
+  pointer-events: none;
+  user-select: none;
+}
