@@ -30,7 +30,6 @@ class Tab {
 
 const HEAVENLY_PAGES = {
   'games':    '/games/g.html',
-  'ai':       '/ai/ai.html',
   'settings': '/settings/settings.html',
   'popup':    '/popup.html',
 };
@@ -427,7 +426,7 @@ function showStartupPopup() {
       title: 'Heavenly',
       sub: '1 of 3',
       counter: '1/3 popups remaining',
-      text: 'To get to Games, AI &amp; Settings, type <b>heavenly://games</b>, <b>heavenly://ai</b>, or <b>heavenly://settings</b> in the address bar.',
+      text: 'To get to Games &amp; Settings, type <b>heavenly://games</b> or <b>heavenly://settings</b> in the address bar.',
     },
     {
       icon: 'star',

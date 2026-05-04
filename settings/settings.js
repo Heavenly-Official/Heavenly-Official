@@ -132,7 +132,6 @@ const SECTIONS = [
             <select class="select-input" id="startup-page">
               <option value="newtab">New Tab</option>
               <option value="heavenly://games">Games</option>
-              <option value="heavenly://ai">AI</option>
             </select>
           </div>
         </div>
@@ -312,7 +311,6 @@ const SECTIONS = [
             <button class="about-link" id="link-github">GitHub</button>
             <button class="about-link" id="link-newtab">New Tab</button>
             <button class="about-link" id="link-games">Games</button>
-            <button class="about-link" id="link-ai">AI</button>
             <button class="about-link" id="link-premium">Premium</button>
           </div>
         </div>
@@ -322,7 +320,6 @@ const SECTIONS = [
       document.getElementById('link-github').addEventListener('click', () => navigate('https://github.com/Heavenly-Official/heavenly-official.github.io'));
       document.getElementById('link-newtab').addEventListener('click', () => navigate('newtab'));
       document.getElementById('link-games').addEventListener('click', () => navigate('heavenly://games'));
-      document.getElementById('link-ai').addEventListener('click', () => navigate('heavenly://ai'));
       document.getElementById('link-premium').addEventListener('click', () => navigate('heavenly://premium'));
     }
   }
