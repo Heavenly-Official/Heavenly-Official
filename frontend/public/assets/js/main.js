@@ -34,6 +34,51 @@ const HEAVENLY_PAGES = {
   'popup':    '/popup.html',
 };
 
+// ── Control Panel ─────────────────────────────────────────
+const CTRL_PANEL_META = {
+  games:    { label: 'Games',    icon: 'gamepad-2' },
+  settings: { label: 'Settings', icon: 'settings'  },
+  popup:    { label: 'Popup',    icon: 'bell'       },
+};
+
+const ctrlPanelOverlay = document.getElementById('ctrl-panel-overlay');
+const ctrlPanelList    = document.getElementById('ctrl-panel-list');
+
+(function buildCtrlPanel() {
+  Object.keys(HEAVENLY_PAGES).forEach(key => {
+    const meta = CTRL_PANEL_META[key] || { label: key.charAt(0).toUpperCase() + key.slice(1), icon: 'file' };
+    const btn = document.createElement('button');
+    btn.className = 'ctrl-panel-item';
+    btn.innerHTML = `
+      <div class="ctrl-panel-item-icon"><i data-lucide="${meta.icon}"></i></div>
+      <div>
+        <div class="ctrl-panel-item-name">${meta.label}</div>
+        <div class="ctrl-panel-item-url">heavenly://${key}</div>
+      </div>
+    `;
+    btn.addEventListener('click', () => {
+      closeCtrlPanel();
+      const tab = tabs.find(t => t.id === activeTabId) || null;
+      navigate('heavenly://' + key, tab);
+    });
+    ctrlPanelList.appendChild(btn);
+  });
+  lucide.createIcons({ nodes: [ctrlPanelList] });
+})();
+
+function openCtrlPanel() {
+  ctrlPanelOverlay.classList.add('open');
+  lucide.createIcons({ nodes: [document.getElementById('ctrl-panel')] });
+}
+
+function closeCtrlPanel() {
+  ctrlPanelOverlay.classList.remove('open');
+}
+
+ctrlPanelOverlay.addEventListener('click', (e) => {
+  if (e.target === ctrlPanelOverlay) closeCtrlPanel();
+});
+
 function buildEmbedUrl(input) {
   input = input.trim();
   if (!input) return null;
@@ -360,6 +405,19 @@ newTabBtn.addEventListener('click', () => createTab('newtab'));
 
 document.addEventListener('keydown', (e) => {
   const meta = e.ctrlKey || e.metaKey;
+
+  if (e.key === 'Escape') {
+    closeCtrlPanel();
+  }
+
+  if (meta && e.key === 'y') {
+    e.preventDefault();
+    if (ctrlPanelOverlay.classList.contains('open')) {
+      closeCtrlPanel();
+    } else {
+      openCtrlPanel();
+    }
+  }
 
   if (meta && e.key === 't') {
     e.preventDefault();
