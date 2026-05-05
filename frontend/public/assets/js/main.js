@@ -687,3 +687,64 @@ applySavedTheme();
 createTab('newtab');
 showStartupPopup();
 
+// ── Custom cursor ──────────────────────────────────────
+(function initCursor() {
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  if (!dot || !ring) return;
+
+  let mouseX = 0, mouseY = 0;
+  let ringX  = 0, ringY  = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.transform  = `translate(calc(-50% + ${mouseX}px), calc(-50% + ${mouseY}px))`;
+  }, { passive: true });
+
+  (function animateRing() {
+    const dx = mouseX - ringX;
+    const dy = mouseY - ringY;
+    if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+      ringX += dx * 0.14;
+      ringY += dy * 0.14;
+      ring.style.transform = `translate(calc(-50% + ${ringX}px), calc(-50% + ${ringY}px))`;
+    }
+    requestAnimationFrame(animateRing);
+  })();
+
+  document.addEventListener('mousedown', () => document.body.classList.add('cursor-clicking'),    { passive: true });
+  document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-clicking'), { passive: true });
+
+  const hoverTargets = 'a, button, [role="button"], .tab, .nav-btn, .new-tab-btn, ' +
+                       '.go-btn, .tab-close, .ctrl-panel-item, .quicklink, label, select';
+  const textTargets  = 'input[type="text"], input[type="search"], textarea, [contenteditable]';
+
+  document.addEventListener('mouseover', (e) => {
+    const el = e.target;
+    if (el.closest(textTargets)) {
+      document.body.classList.remove('cursor-hovering');
+      document.body.classList.add('cursor-text');
+    } else if (el.closest(hoverTargets)) {
+      document.body.classList.remove('cursor-text');
+      document.body.classList.add('cursor-hovering');
+    } else {
+      document.body.classList.remove('cursor-hovering', 'cursor-text');
+    }
+  }, { passive: true });
+
+  // Hide cursor elements when mouse leaves the browser window
+  document.addEventListener('mouseout', (e) => {
+    if (e.relatedTarget === null) {
+      dot.style.opacity  = '0';
+      ring.style.opacity = '0';
+    }
+  }, { passive: true });
+
+  document.addEventListener('mouseover', (e) => {
+    if (e.relatedTarget === null) {
+      dot.style.opacity  = '';
+      ring.style.opacity = '';
+    }
+  }, { passive: true });
+})();
