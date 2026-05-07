@@ -40,9 +40,9 @@ document.getElementById('search').addEventListener('input', function() {
 
 function normalizeGame(game) {
   return {
-    name: (game && game.name) ? game.name : 'Untitled Game',
-    icon: (game && game.icon) ? game.icon : 'gamepad-2',
-    tag: (game && game.tag) ? game.tag : 'Hydra',
+    name: game?.name || 'Untitled Game',
+    icon: game?.icon || 'gamepad-2',
+    tag: game?.tag || 'Hydra',
     url: game && game.url ? game.url : '',
   };
 }
@@ -52,7 +52,7 @@ async function loadGames() {
   grid.innerHTML = '<div class="empty">Loading games…</div>';
 
   try {
-    const res = await fetch('hydra-games.json', { cache: 'no-store' });
+    const res = await fetch('hydra-games.json');
     if (!res.ok) throw new Error('Failed to load Hydra catalog');
 
     const data = await res.json();
