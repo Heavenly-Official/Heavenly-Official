@@ -609,12 +609,18 @@ body.cursor-text #cursor-ring {
 /* ── Ctrl+Y hint note ───────────────────────────────────── */
 #ctrl-panel-hint {
   position: fixed;
-  bottom: 10px;
-  left: 12px;
+  bottom: 14px;
+  left: 14px;
   z-index: 9000;
-  font-size: 10px;
-  color: #3a3a3a;
-  letter-spacing: 0.06em;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e5e7eb;
+  letter-spacing: 0.04em;
+  background: rgba(17, 24, 39, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 6px 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   user-select: none;
 }
