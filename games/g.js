@@ -7,7 +7,7 @@ const FALLBACK_GAMES = [
 const jsonUrl = 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/for-a-friedn-@main/1.json';
 const source1URL = 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Folder-1@main/';
 const source2URL = 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Folder-2@main/';
-const source3URL = 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Folder-3@main';
+const source3URL = 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Folder-3@main/';
 
 let games = [];
 
