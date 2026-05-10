@@ -38,14 +38,13 @@ const HEAVENLY_PAGES = {
 const CTRL_PANEL_META = {
   games:    { label: 'Games',    icon: 'gamepad-2' },
   settings: { label: 'Settings', icon: 'settings'  },
-  popup:    { label: 'Popup',    icon: 'bell'       },
 };
 
 const ctrlPanelOverlay = document.getElementById('ctrl-panel-overlay');
 const ctrlPanelList    = document.getElementById('ctrl-panel-list');
 
 (function buildCtrlPanel() {
-  Object.keys(HEAVENLY_PAGES).forEach(key => {
+  Object.keys(CTRL_PANEL_META).forEach(key => {
     const meta = CTRL_PANEL_META[key] || { label: key.charAt(0).toUpperCase() + key.slice(1), icon: 'file' };
     const btn = document.createElement('button');
     btn.className = 'ctrl-panel-item';
@@ -467,123 +466,52 @@ function showStartupPopup() {
   if (seen) return;
   sessionStorage.setItem('heavenly_popup_shown', '1');
 
-  const overlay = document.createElement('div');
-  overlay.id = 'popup-overlay';
-  overlay.style.cssText = `
-    position: fixed; inset: 0; z-index: 9999;
-    pointer-events: none;
-    display: flex; flex-direction: column;
-    align-items: flex-end; justify-content: flex-end;
-    padding: 24px; gap: 12px;
+  const popup = document.createElement('div');
+  popup.id = 'startup-popup';
+  popup.style.cssText = `
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    transform: translate(-50%, 14px);
+    z-index: 9999;
+    width: min(560px, calc(100vw - 24px));
+    background: rgba(23, 23, 23, 0.96);
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: #e5e7eb;
+    font-size: 13px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
   `;
-  document.body.appendChild(overlay);
+  popup.innerHTML = `
+    <i data-lucide="info" style="width:14px;height:14px;flex:0 0 auto;color:#10b981"></i>
+    <span style="flex:1 1 auto">Type <b>heavenly://games</b> or <b>heavenly://settings</b> in the address bar to open internal pages.</span>
+    <button data-close style="background:transparent;border:none;color:#9ca3af;cursor:pointer;padding:2px;display:flex;align-items:center;justify-content:center">
+      <i data-lucide="x" style="width:14px;height:14px"></i>
+    </button>
+  `;
+  document.body.appendChild(popup);
 
-  const msgs = [
-    {
-      icon: 'sparkles',
-      title: 'Heavenly',
-      sub: '1 of 3',
-      counter: '1/3 popups remaining',
-      text: 'To get to Games &amp; Settings, type <b>heavenly://games</b> or <b>heavenly://settings</b> in the address bar.',
-    },
-    {
-      icon: 'star',
-      title: 'Heavenly Premium',
-      sub: '2 of 3',
-      counter: '2/3 popups remaining',
-      text: 'Unlock the full Heavenly experience. Visit <b>heavenly://premium</b> to purchase our premium plan.',
-    },
-    {
-      icon: 'heart',
-      title: 'Support Us',
-      sub: '3 of 3',
-      counter: '3/3',
-      text: 'Love Heavenly? Support us on CashApp: <b>$OhheyElijah</b> 💚',
-    },
-  ];
+  function closePopup() {
+    popup.style.opacity = '0';
+    popup.style.transform = 'translate(-50%, 14px)';
+    setTimeout(() => popup.remove(), 250);
+  }
 
-  const cards = [];
+  popup.querySelector('[data-close]').addEventListener('click', closePopup);
+  setTimeout(() => closePopup(), 7000);
 
-  msgs.forEach((m, i) => {
-    const card = document.createElement('div');
-    card.style.cssText = `
-      width: 300px;
-      background: #202123;
-      border: 1px solid #3a3a3a;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-      opacity: 0;
-      transform: translateY(16px) scale(0.96);
-      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1);
-      pointer-events: all;
-    `;
-    card.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid #2f2f2f">
-        <div style="width:28px;height:28px;border-radius:50%;background:#10a37f;display:flex;align-items:center;justify-content:center;flex:0 0 28px">
-          <i data-lucide="${m.icon}" style="width:14px;height:14px;color:#fff"></i>
-        </div>
-        <div>
-          <div style="font-size:13px;font-weight:600;color:#ececec;font-family:inherit">${m.title}</div>
-          <div style="font-size:11px;color:#8e8ea0;font-family:inherit">${m.sub}</div>
-        </div>
-        <button data-close style="margin-left:auto;width:22px;height:22px;border-radius:5px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#8e8ea0">
-          <i data-lucide="x" style="width:13px;height:13px"></i>
-        </button>
-      </div>
-      <div style="padding:14px 16px 8px;min-height:72px;display:flex;flex-direction:column;justify-content:center">
-        <div class="hpopup-loader" style="display:flex;gap:5px;align-items:center;padding:4px 0">
-          <div style="width:7px;height:7px;border-radius:50%;background:#8e8ea0;animation:hbounce 1.2s ease-in-out infinite 0s"></div>
-          <div style="width:7px;height:7px;border-radius:50%;background:#8e8ea0;animation:hbounce 1.2s ease-in-out infinite 0.2s"></div>
-          <div style="width:7px;height:7px;border-radius:50%;background:#8e8ea0;animation:hbounce 1.2s ease-in-out infinite 0.4s"></div>
-        </div>
-        <div class="hpopup-msg" style="font-size:13px;line-height:1.6;color:#d1d5db;display:none;font-family:inherit">${m.text}</div>
-      </div>
-      <div style="padding:0 16px 14px;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:10px;color:#555;font-family:inherit">${m.counter}</span>
-      </div>
-    `;
-    overlay.appendChild(card);
-    cards.push(card);
-
-    card.querySelector('[data-close]').addEventListener('click', () => {
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(8px) scale(0.97)';
-      setTimeout(() => card.remove(), 350);
-    });
+  requestAnimationFrame(() => {
+    popup.style.opacity = '1';
+    popup.style.transform = 'translate(-50%, 0)';
   });
-
-  // Inject animation keyframes once
-  if (!document.getElementById('hpopup-style')) {
-    const style = document.createElement('style');
-    style.id = 'hpopup-style';
-    style.textContent = `@keyframes hbounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}`;
-    document.head.appendChild(style);
-  }
-
-  function revealCard(idx, delay) {
-    setTimeout(() => {
-      const card = cards[idx];
-      if (!card) return;
-      requestAnimationFrame(() => {
-        card.style.opacity = '1';
-        card.style.transform = 'translateY(0) scale(1)';
-      });
-      setTimeout(() => {
-        const loader = card.querySelector('.hpopup-loader');
-        const msg    = card.querySelector('.hpopup-msg');
-        if (loader) loader.style.display = 'none';
-        if (msg) msg.style.display = 'block';
-        lucide.createIcons({ nodes: [card] });
-      }, 1200);
-    }, delay);
-  }
-
-  lucide.createIcons({ nodes: [overlay] });
-
-  revealCard(0, 500);
-  revealCard(1, 3700);
-  revealCard(2, 6900);
+  lucide.createIcons({ nodes: [popup] });
 }
 
 // ── Message listener ───────────────────────────────────

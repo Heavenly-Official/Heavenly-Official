@@ -8,40 +8,124 @@ const jsonUrl = 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/for-a-friedn-@ma
 const source1URL = 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Folder-1@main/';
 const source2URL = 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Folder-2@main/';
 const source3URL = 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Folder-3@main/';
+const BATCH_SIZE = 48;
 
 let games = [];
+let filteredGames = [];
+let renderedCount = 0;
+let lazyObserver = null;
+let lazyObserved = false;
+
+const grid = document.getElementById('games-grid');
+const searchInput = document.getElementById('search');
+const gamesCounter = document.getElementById('games-counter');
+const gridSentinel = document.getElementById('grid-sentinel');
+const gamesArea = document.querySelector('.games-area');
 
 function navigate(url) {
-  try { window.parent.postMessage({ type: 'navigate', url }, '*'); } catch(e) {}
+  try { window.parent.postMessage({ type: 'navigate', url }, '*'); } catch (e) {}
 }
 
-function render(list) {
-  const grid = document.getElementById('games-grid');
-  if (!list.length) {
-    grid.innerHTML = '<div class="empty">No games found.</div>';
+function updateCounter() {
+  const total = games.length;
+  const matching = filteredGames.length;
+  if (!matching) {
+    gamesCounter.textContent = '0 games';
     return;
   }
-  grid.innerHTML = '';
-  list.forEach(g => {
-    const card = document.createElement('div');
-    card.className = 'game-card';
-    card.innerHTML = `
-      <div class="game-icon"><i data-lucide="${g.icon}"></i></div>
-      <div class="game-name">${g.name}</div>
-      <div class="game-tag">${g.tag}</div>
-    `;
-    card.addEventListener('click', () => navigate(g.url));
-    grid.appendChild(card);
-  });
-  lucide.createIcons();
+
+  if (matching === total) {
+    gamesCounter.textContent = renderedCount < matching
+      ? `Showing ${renderedCount}/${matching} games`
+      : `${matching} games`;
+    return;
+  }
+
+  gamesCounter.textContent = renderedCount < matching
+    ? `Showing ${renderedCount}/${matching} of ${total} games`
+    : `Showing ${matching} of ${total} games`;
 }
 
-document.getElementById('search').addEventListener('input', function() {
-  const q = this.value.trim().toLowerCase();
-  render(q ? games.filter(g =>
-    g.name.toLowerCase().includes(q) || g.tag.toLowerCase().includes(q)
-  ) : games);
-});
+function setLazyLoadingEnabled(enabled) {
+  if (!lazyObserver) return;
+  if (enabled && !lazyObserved) {
+    lazyObserver.observe(gridSentinel);
+    lazyObserved = true;
+    return;
+  }
+  if (!enabled && lazyObserved) {
+    lazyObserver.unobserve(gridSentinel);
+    lazyObserved = false;
+  }
+}
+
+function createGameCard(g) {
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  card.innerHTML = `
+    <div class="game-icon"><i data-lucide="${g.icon}"></i></div>
+    <div class="game-name">${g.name}</div>
+    <div class="game-tag">${g.tag}</div>
+  `;
+  card.addEventListener('click', () => navigate(g.url));
+  return card;
+}
+
+function renderNextBatch() {
+  if (renderedCount >= filteredGames.length) {
+    setLazyLoadingEnabled(false);
+    updateCounter();
+    return;
+  }
+
+  const next = filteredGames.slice(renderedCount, renderedCount + BATCH_SIZE);
+  const frag = document.createDocumentFragment();
+
+  next.forEach((g) => frag.appendChild(createGameCard(g)));
+
+  grid.appendChild(frag);
+  renderedCount += next.length;
+  lucide.createIcons();
+  updateCounter();
+  setLazyLoadingEnabled(renderedCount < filteredGames.length);
+}
+
+function renderAllAtOnce() {
+  const frag = document.createDocumentFragment();
+  filteredGames.forEach((g) => frag.appendChild(createGameCard(g)));
+  grid.appendChild(frag);
+  renderedCount = filteredGames.length;
+  lucide.createIcons();
+  setLazyLoadingEnabled(false);
+  updateCounter();
+}
+
+function renderFilteredList() {
+  renderedCount = 0;
+  grid.innerHTML = '';
+
+  if (!filteredGames.length) {
+    grid.innerHTML = '<div class="empty">No games found.</div>';
+    setLazyLoadingEnabled(false);
+    updateCounter();
+    return;
+  }
+
+  if (!lazyObserver) {
+    renderAllAtOnce();
+    return;
+  }
+
+  renderNextBatch();
+}
+
+function applyFilter(query) {
+  const q = query.trim().toLowerCase();
+  filteredGames = q
+    ? games.filter((g) => g.name.toLowerCase().includes(q) || g.tag.toLowerCase().includes(q))
+    : games.slice();
+  renderFilteredList();
+}
 
 function normalizeGame(game) {
   const normalizedURL = resolveGameURL(game);
@@ -92,7 +176,7 @@ function flattenCatalog(data) {
     if (key.includes('3')) inferredSource = 3;
     else if (key.includes('2')) inferredSource = 2;
     else if (key.includes('1')) inferredSource = 1;
-    value.forEach(item => {
+    value.forEach((item) => {
       if (item && typeof item === 'object' && inferredSource && (item.source === null || item.source === undefined)) {
         all.push({ ...item, source: inferredSource });
       } else {
@@ -104,8 +188,8 @@ function flattenCatalog(data) {
 }
 
 async function loadGames() {
-  const grid = document.getElementById('games-grid');
   grid.innerHTML = '<div class="empty">Loading games…</div>';
+  gamesCounter.textContent = 'Loading…';
 
   try {
     const res = await fetch(jsonUrl);
@@ -115,23 +199,39 @@ async function loadGames() {
     const parsed = flattenCatalog(data);
     if (!parsed.length) throw new Error('Remote catalog is empty');
 
-    games = parsed.map(normalizeGame).filter(g => g.url);
-    render(games);
+    games = parsed.map(normalizeGame).filter((g) => g.url);
+    applyFilter(searchInput.value);
   } catch (e) {
     try {
       const localRes = await fetch('hydra-games.json');
       if (!localRes.ok) throw new Error('Failed to load local Hydra catalog');
       const localData = await localRes.json();
       const parsedLocal = flattenCatalog(localData);
-      games = parsedLocal.map(normalizeGame).filter(g => g.url);
+      games = parsedLocal.map(normalizeGame).filter((g) => g.url);
       if (!games.length) throw new Error('Local Hydra catalog is empty');
-      render(games);
+      applyFilter(searchInput.value);
       return;
     } catch (_) {
       games = FALLBACK_GAMES;
-      render(games);
+      applyFilter(searchInput.value);
     }
   }
+}
+
+searchInput.addEventListener('input', function () {
+  applyFilter(this.value);
+});
+
+if ('IntersectionObserver' in window) {
+  lazyObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) renderNextBatch();
+    });
+  }, {
+    root: gamesArea,
+    rootMargin: '120px 0px',
+    threshold: 0.01,
+  });
 }
 
 loadGames();
