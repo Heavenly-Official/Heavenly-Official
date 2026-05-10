@@ -14,6 +14,7 @@ let games = [];
 let filteredGames = [];
 let renderedCount = 0;
 let lazyObserver = null;
+let lazyObserved = false;
 
 const grid = document.getElementById('games-grid');
 const searchInput = document.getElementById('search');
@@ -47,8 +48,27 @@ function updateCounter() {
 
 function setLazyLoadingEnabled(enabled) {
   if (!lazyObserver) return;
-  lazyObserver.unobserve(gridSentinel);
-  if (enabled) lazyObserver.observe(gridSentinel);
+  if (enabled && !lazyObserved) {
+    lazyObserver.observe(gridSentinel);
+    lazyObserved = true;
+    return;
+  }
+  if (!enabled && lazyObserved) {
+    lazyObserver.unobserve(gridSentinel);
+    lazyObserved = false;
+  }
+}
+
+function createGameCard(g) {
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  card.innerHTML = `
+    <div class="game-icon"><i data-lucide="${g.icon}"></i></div>
+    <div class="game-name">${g.name}</div>
+    <div class="game-tag">${g.tag}</div>
+  `;
+  card.addEventListener('click', () => navigate(g.url));
+  return card;
 }
 
 function renderNextBatch() {
@@ -61,23 +81,23 @@ function renderNextBatch() {
   const next = filteredGames.slice(renderedCount, renderedCount + BATCH_SIZE);
   const frag = document.createDocumentFragment();
 
-  next.forEach((g) => {
-    const card = document.createElement('div');
-    card.className = 'game-card';
-    card.innerHTML = `
-      <div class="game-icon"><i data-lucide="${g.icon}"></i></div>
-      <div class="game-name">${g.name}</div>
-      <div class="game-tag">${g.tag}</div>
-    `;
-    card.addEventListener('click', () => navigate(g.url));
-    frag.appendChild(card);
-  });
+  next.forEach((g) => frag.appendChild(createGameCard(g)));
 
   grid.appendChild(frag);
   renderedCount += next.length;
   lucide.createIcons();
   updateCounter();
   setLazyLoadingEnabled(renderedCount < filteredGames.length);
+}
+
+function renderAllAtOnce() {
+  const frag = document.createDocumentFragment();
+  filteredGames.forEach((g) => frag.appendChild(createGameCard(g)));
+  grid.appendChild(frag);
+  renderedCount = filteredGames.length;
+  lucide.createIcons();
+  setLazyLoadingEnabled(false);
+  updateCounter();
 }
 
 function renderFilteredList() {
@@ -91,10 +111,12 @@ function renderFilteredList() {
     return;
   }
 
-  renderNextBatch();
   if (!lazyObserver) {
-    while (renderedCount < filteredGames.length) renderNextBatch();
+    renderAllAtOnce();
+    return;
   }
+
+  renderNextBatch();
 }
 
 function applyFilter(query) {
