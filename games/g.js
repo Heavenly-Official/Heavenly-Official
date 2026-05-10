@@ -88,7 +88,10 @@ function flattenCatalog(data) {
   const all = [];
   Object.entries(data).forEach(([key, value]) => {
     if (!Array.isArray(value)) return;
-    const inferredSource = key.includes('3') ? 3 : key.includes('2') ? 2 : key.includes('1') ? 1 : undefined;
+    let inferredSource;
+    if (key.includes('3')) inferredSource = 3;
+    else if (key.includes('2')) inferredSource = 2;
+    else if (key.includes('1')) inferredSource = 1;
     value.forEach(item => {
       if (item && typeof item === 'object' && inferredSource && item.source == null) {
         all.push({ ...item, source: inferredSource });
