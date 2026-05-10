@@ -42,7 +42,7 @@ function updateCounter() {
   }
 
   gamesCounter.textContent = renderedCount < matching
-    ? `Showing ${renderedCount}/${matching} of ${total}`
+    ? `Showing ${renderedCount}/${matching} of ${total} games`
     : `Showing ${matching} of ${total} games`;
 }
 

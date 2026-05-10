@@ -45,8 +45,6 @@ const ctrlPanelList    = document.getElementById('ctrl-panel-list');
 
 (function buildCtrlPanel() {
   Object.keys(CTRL_PANEL_META).forEach(key => {
-    const pagePath = HEAVENLY_PAGES[key];
-    if (!pagePath) return;
     const meta = CTRL_PANEL_META[key] || { label: key.charAt(0).toUpperCase() + key.slice(1), icon: 'file' };
     const btn = document.createElement('button');
     btn.className = 'ctrl-panel-item';
