@@ -93,7 +93,7 @@ function flattenCatalog(data) {
     else if (key.includes('2')) inferredSource = 2;
     else if (key.includes('1')) inferredSource = 1;
     value.forEach(item => {
-      if (item && typeof item === 'object' && inferredSource && item.source == null) {
+      if (item && typeof item === 'object' && inferredSource && (item.source === null || item.source === undefined)) {
         all.push({ ...item, source: inferredSource });
       } else {
         all.push(item);
