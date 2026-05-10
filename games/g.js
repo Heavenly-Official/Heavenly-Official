@@ -92,6 +92,9 @@ function renderFilteredList() {
   }
 
   renderNextBatch();
+  if (!lazyObserver) {
+    while (renderedCount < filteredGames.length) renderNextBatch();
+  }
 }
 
 function applyFilter(query) {
