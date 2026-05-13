@@ -131,7 +131,6 @@ const SECTIONS = [
             <div><div class="setting-label">Open page</div></div>
             <select class="select-input" id="startup-page">
               <option value="newtab">New Tab</option>
-              <option value="heavenly://games">Games</option>
             </select>
           </div>
         </div>
@@ -145,6 +144,16 @@ const SECTIONS = [
               <option value="https://www.bing.com/search?q=">Bing</option>
               <option value="https://search.brave.com/search?q=">Brave</option>
             </select>
+          </div>
+        </div>
+        <div class="group">
+          <div class="group-label">Proxy</div>
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">Wisp server</div>
+              <div class="setting-sub">WebSocket endpoint used for proxy transport</div>
+            </div>
+            <input class="text-input" id="wisp-url" type="text" placeholder="wss://example.com/wisp/" />
           </div>
         </div>
         <div class="group">
@@ -170,6 +179,10 @@ const SECTIONS = [
         save('engine', engineSel.value);
         try { window.parent.postMessage({ type: 'search_engine', value: engineSel.value }, '*'); } catch(e) {}
       });
+
+      const wispInput = document.getElementById('wisp-url');
+      wispInput.value = load('wisp', '');
+      wispInput.addEventListener('change', () => save('wisp', wispInput.value.trim()));
 
       setupToggle('toggle-ask-download', 'ask_download', 'off');
     }
@@ -310,7 +323,6 @@ const SECTIONS = [
           <div class="about-links">
             <button class="about-link" id="link-github">GitHub</button>
             <button class="about-link" id="link-newtab">New Tab</button>
-            <button class="about-link" id="link-games">Games</button>
             <button class="about-link" id="link-premium">Premium</button>
           </div>
         </div>
@@ -319,7 +331,6 @@ const SECTIONS = [
     init() {
       document.getElementById('link-github').addEventListener('click', () => navigate('https://github.com/Heavenly-Official/heavenly-official.github.io'));
       document.getElementById('link-newtab').addEventListener('click', () => navigate('newtab'));
-      document.getElementById('link-games').addEventListener('click', () => navigate('heavenly://games'));
       document.getElementById('link-premium').addEventListener('click', () => navigate('heavenly://premium'));
     }
   }
