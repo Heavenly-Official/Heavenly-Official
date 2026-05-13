@@ -29,14 +29,12 @@ class Tab {
 }
 
 const HEAVENLY_PAGES = {
-  'games':    '/games/g.html',
   'settings': '/settings/settings.html',
   'popup':    '/popup.html',
 };
 
 // ── Control Panel ─────────────────────────────────────────
 const CTRL_PANEL_META = {
-  games:    { label: 'Games',    icon: 'gamepad-2' },
   settings: { label: 'Settings', icon: 'settings'  },
 };
 
@@ -491,7 +489,7 @@ function showStartupPopup() {
   `;
   popup.innerHTML = `
     <i data-lucide="info" style="width:14px;height:14px;flex:0 0 auto;color:#10b981"></i>
-    <span style="flex:1 1 auto">Type <b>heavenly://games</b> or <b>heavenly://settings</b> in the address bar to open internal pages.</span>
+    <span style="flex:1 1 auto">Type <b>heavenly://settings</b> in the address bar to open internal pages.</span>
     <button data-close style="background:transparent;border:none;color:#9ca3af;cursor:pointer;padding:2px;display:flex;align-items:center;justify-content:center">
       <i data-lucide="x" style="width:14px;height:14px"></i>
     </button>
