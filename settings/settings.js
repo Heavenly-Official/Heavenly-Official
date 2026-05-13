@@ -147,6 +147,16 @@ const SECTIONS = [
           </div>
         </div>
         <div class="group">
+          <div class="group-label">Proxy</div>
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">Wisp server</div>
+              <div class="setting-sub">WebSocket endpoint used for proxy transport</div>
+            </div>
+            <input class="text-input" id="wisp-url" type="text" placeholder="wss://example.com/wisp/" />
+          </div>
+        </div>
+        <div class="group">
           <div class="group-label">Downloads</div>
           <div class="setting-row">
             <div>
@@ -169,6 +179,10 @@ const SECTIONS = [
         save('engine', engineSel.value);
         try { window.parent.postMessage({ type: 'search_engine', value: engineSel.value }, '*'); } catch(e) {}
       });
+
+      const wispInput = document.getElementById('wisp-url');
+      wispInput.value = load('wisp', '');
+      wispInput.addEventListener('change', () => save('wisp', wispInput.value.trim()));
 
       setupToggle('toggle-ask-download', 'ask_download', 'off');
     }
